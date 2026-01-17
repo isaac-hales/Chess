@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Represents a single chess piece
@@ -9,6 +10,8 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessPiece {
+
+
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
     }
 
@@ -50,7 +53,7 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        return List.of(); //This is just an empty list of moves, to let tests run
 
     }
 }
