@@ -9,10 +9,10 @@ import base.ChessPieces;
  * signature of the existing methods.
  */
 public class ChessBoard {
-
+    //Java Arrays are 0 based, but the tests are 1 based.
+    ChessPiece[][] squares = new ChessPiece[8][8]; //This is allocating the memory for it
     public ChessBoard() {
-        //Make an array of 8 by 8?
-        let chessBoardArray = new array(8,8);
+
     }
 
     /**
@@ -23,8 +23,7 @@ public class ChessBoard {
      */
                         //Position is in tuple, piece name is all caps i.e. QUEEN ROOK BISHOP KNIGHT KING PAWN
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        throw new RuntimeException("Not implemented");
-        let chessBoardArray(position) = piece;
+        squares[position.getRow()-1][position.getColumn()-1] = piece;
     }
 
     /**
@@ -35,11 +34,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        throw new RuntimeException("Not implemented");
-        if ChessPiece.position.equals(position):
-            return ChessPiece;
-        else:
-            return null;
+        return squares[position.getRow()-1][position.getColumn()-1] = piece;
     }
 
      /**
