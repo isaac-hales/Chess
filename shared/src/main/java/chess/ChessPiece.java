@@ -3,6 +3,7 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -111,8 +112,8 @@ public class ChessPiece {
                     new ChessPosition(2, -1),new ChessPosition(1, -2),new ChessPosition(-2, 1),
                     new ChessPosition(-1, 2),new ChessPosition(-2, -1),new ChessPosition(-1, -2));
             for (ChessPosition move : potentialKnightMoves) {
-                if (startPosition.getRow() + move.getRow() < 0 || startPosition.getRow() + move.getRow() >= 8 ||
-                        startPosition.getColumn() + move.getColumn() < 0 || startPosition.getColumn() + move.getColumn() >= 8) {continue;}
+                if (startPosition.getRow() + move.getRow() <= 0 || startPosition.getRow() + move.getRow() >= 8 ||
+                        startPosition.getColumn() + move.getColumn() <= 0 || startPosition.getColumn() + move.getColumn() >= 8) {continue;}
                 else {
                     moveList.add(new ChessMove(startPosition,new ChessPosition(startPosition.getRow() + move.getRow(), startPosition.getColumn() + move.getColumn()),null));
                 }
@@ -145,32 +146,32 @@ public class ChessPiece {
                 }
             }
             for (int i = 1; i < 8; i++) {
-                if (startPosition.getRow() + i >= 8 || startPosition.getColumn() - i < 0) {continue;}
+                if (startPosition.getRow() + i >= 8 || startPosition.getColumn() - i <= 0) {continue;}
                 else {
                     moveList.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow() + i,startPosition.getColumn() - i), null));
                 }
             }
             for (int i = 1; i < 8; i++) {
-                if (startPosition.getRow() - i < 0 || startPosition.getColumn() + i >= 8) {continue;}
+                if (startPosition.getRow() - i <= 0 || startPosition.getColumn() + i >= 8) {continue;}
                 else {
                     moveList.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow() - i,startPosition.getColumn() + i), null));
                 }
             }
             for (int i = 1; i < 8; i++) {
-                if (startPosition.getRow() - i < 0 || startPosition.getColumn() - i < 0 ) {continue;}
+                if (startPosition.getRow() - i <= 0 || startPosition.getColumn() - i <= 0 ) {continue;}
                 else {
                     moveList.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow() - i,startPosition.getColumn() - i), null));
                 }
             }
             //Rook Moves
             for (int i = -7; i < 8; i++) {
-                if (startPosition.getRow() + i < 0 || startPosition.getRow() + i >= 8) {continue;}
+                if (startPosition.getRow() + i <= 0 || startPosition.getRow() + i >= 8) {continue;}
                 else {
                     moveList.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow() + i,startPosition.getColumn()), null));
                 }
             }
             for (int i = -7; i < 8; i++) {
-                if (startPosition.getColumn() + i < 0 || startPosition.getColumn() +i >= 8) {continue;}
+                if (startPosition.getColumn() + i <= 0 || startPosition.getColumn() +i >= 8) {continue;}
                 else {
                     moveList.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow(),startPosition.getColumn() + i), null));
                 }
@@ -180,13 +181,13 @@ public class ChessPiece {
         }
         else if (this.type == ChessPiece.PieceType.ROOK) {
             for (int i = -7; i < 8; i++) {
-                if (startPosition.getRow() + i < 0 || startPosition.getRow() + i >= 8) {continue;}
+                if (startPosition.getRow() + i <= 0 || startPosition.getRow() + i >= 8) {continue;}
                 else {
                     moveList.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow() + i,startPosition.getColumn()), null));
                 }
             }
             for (int i = -7; i < 8; i++) {
-                if (startPosition.getColumn() + i < 0 || startPosition.getColumn() +i >= 8) {continue;}
+                if (startPosition.getColumn() + i <= 0 || startPosition.getColumn() +i >= 8) {continue;}
                 else {
                     moveList.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow(),startPosition.getColumn() + i), null));
                 }
@@ -196,5 +197,27 @@ public class ChessPiece {
             throw new RuntimeException("INVALID PIECE! WHAT DID YOU DO?!?!");
         }
         return moveList;
+    }
+
+    @Override
+    public String toString() {
+        return "ChessPiece{" +
+                "pieceColor=" + pieceColor +
+                ", type=" + type +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
     }
 }

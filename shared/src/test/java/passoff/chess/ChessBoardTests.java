@@ -17,6 +17,7 @@ public class ChessBoardTests extends EqualsTestingUtility<ChessBoard> {
         super("ChessBoard", "boards");
     }
 
+
     @Test
     @DisplayName("Construct Empty ChessBoard")
     public void constructChessBoard() {
