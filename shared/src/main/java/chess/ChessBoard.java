@@ -1,7 +1,5 @@
 package chess;
 
-import base.ChessPieces;
-
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -21,9 +19,8 @@ public class ChessBoard {
      * @param position where to add the piece to
      * @param piece    the piece to add
      */
-                        //Position is in tuple, piece name is all caps i.e. QUEEN ROOK BISHOP KNIGHT KING PAWN
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        squares[position.getRow()-1][position.getColumn()-1] = piece;
+        squares[position.getRow()-1][position.getColumn()-1] = piece; //If it's empty, it will return a null, else it will return a piece
     }
 
     /**
@@ -34,12 +31,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        if (squares[position.getRow()-1][position.getColumn()-1] == ) {
-            return squares[position.getRow()-1][position.getColumn()-1];
-        }
-        else {
-            return null;
-        }
+            return squares[position.getRow() - 1][position.getColumn() - 1];
     }
 
      /**
