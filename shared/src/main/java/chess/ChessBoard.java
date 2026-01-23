@@ -39,20 +39,6 @@ public class ChessBoard {
             return squares[position.getRow() - 1][position.getColumn() - 1];
     }
 
-    public void printPieces(ChessBoard myBoard){
-        myBoard.resetBoard();
-        //Check what's at each position
-        for (int row = 1; row <= 8; row++) {
-            for (int col = 1; col <= 8; col++) {
-                ChessPiece piece = myBoard.getPiece(new ChessPosition(row, col));
-                if (piece != null) {
-                    System.out.println("Row " + row + ", Col " + col + ": " +
-                            piece.getTeamColor() + " " + piece.getPieceType());
-                }
-            }
-        }
-    }
-
      /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)

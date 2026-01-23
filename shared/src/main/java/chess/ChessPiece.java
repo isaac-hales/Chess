@@ -57,38 +57,90 @@ public class ChessPiece {
      */
     //Update to get all the different pieces
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return PieceMoveCalculator(myPosition);
+        return PieceMoveCalculator(myPosition, board);
     }
 
     //Move it to its own class, for better code quality.
-    public List<ChessMove> PieceMoveCalculator(ChessPosition startPosition) {
+    public List<ChessMove> PieceMoveCalculator(ChessPosition startPosition, ChessBoard board) {
         final ArrayList<ChessMove> moveList = new ArrayList<>();
         if (this.type == ChessPiece.PieceType.BISHOP) {
-            //return a list of positions if given a start position
-            //+row,+col +row,-col -row,-col -row,+col
+            //Going Down, Right
             for (int i = 1; i < 8; i++) {
-                if (startPosition.getRow() + i >= 8 || startPosition.getColumn() + i >= 8) {continue;}
-                else {
-                    moveList.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow() + i, startPosition.getColumn() + i), null));
+                int newRow = startPosition.getRow() + i;
+                int newCol = startPosition.getColumn() + i;
+                if (newRow > 8 || newCol > 8){break;}
+                ChessPosition newPosition = new ChessPosition(newRow,newCol);
+                ChessPiece adjacentPiece = board.getPiece(newPosition);
+                //Free spot, good to go.
+                if (adjacentPiece == null){
+                    moveList.add(new ChessMove(startPosition, newPosition,null));
                 }
+                //Capturing an enemy piece
+                else if (adjacentPiece.getTeamColor() != this.pieceColor){
+                    moveList.add(new ChessMove(startPosition, newPosition,null));
+                    break;
+                }
+                //This is a friendly piece.
+                else {break;}
+
+            }
+            //Going Up, Left
+            for (int i = 1; i < 8; i++) {
+                int newRow = startPosition.getRow() + i;
+                int newCol = startPosition.getColumn() - i;
+                if (newRow > 8 || newCol < 1){break;}
+                ChessPosition newPosition = new ChessPosition(newRow,newCol);
+                ChessPiece adjacentPiece = board.getPiece(newPosition);
+                //Free spot, good to go.
+                if (adjacentPiece == null){
+                    moveList.add(new ChessMove(startPosition, newPosition,null));
+                }
+                //Capturing an enemy piece
+                else if (adjacentPiece.getTeamColor() != this.pieceColor){
+                    moveList.add(new ChessMove(startPosition, newPosition,null));
+                    break;
+                }
+                //This is a friendly piece.
+                else {break;}
+            }
+            //Going Down, right
+            for (int i = 1; i < 8; i++) {
+                int newRow = startPosition.getRow() - i;
+                int newCol = startPosition.getColumn() + i;
+                if (newRow < 1 || newCol > 8){break;}
+                ChessPosition newPosition = new ChessPosition(newRow,newCol);
+                ChessPiece adjacentPiece = board.getPiece(newPosition);
+
+                //Free spot, good to go.
+                if (adjacentPiece == null){
+                    moveList.add(new ChessMove(startPosition, newPosition,null));
+                }
+                //Capturing an enemy piece
+                else if (adjacentPiece.getTeamColor() != this.pieceColor){
+                    moveList.add(new ChessMove(startPosition, newPosition,null));
+                    break;
+                }
+                //This is a friendly piece.
+                else {break;}
             }
             for (int i = 1; i < 8; i++) {
-                if (startPosition.getRow() + i >= 8 || startPosition.getColumn() - i < 0 ) {continue;}
-                else {
-                    moveList.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow() + i,startPosition.getColumn() - i),null));
+                int newRow = startPosition.getRow() - i;
+                int newCol = startPosition.getColumn() - i;
+                if (newRow < 1 || newCol < 1){break;}
+                ChessPosition newPosition = new ChessPosition(newRow,newCol);
+                ChessPiece adjacentPiece = board.getPiece(newPosition);
+
+                //Free spot, good to go.
+                if (adjacentPiece == null){
+                    moveList.add(new ChessMove(startPosition, newPosition,null));
                 }
-            }
-            for (int i = 1; i < 8; i++) {
-                if (startPosition.getRow() - i < 0 || startPosition.getColumn() + i >= 8) {continue;}
-                else {
-                    moveList.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow() - i,startPosition.getColumn() + i),null));
+                //Capturing an enemy piece
+                else if (adjacentPiece.getTeamColor() != this.pieceColor){
+                    moveList.add(new ChessMove(startPosition, newPosition,null));
+                    break;
                 }
-            }
-            for (int i = 1; i < 8; i++) {
-                if (startPosition.getRow() - i < 0 || startPosition.getColumn() - i < 0) {continue;}
-                else {
-                    moveList.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow() - i,startPosition.getColumn() - i),null));
-                }
+                //This is a friendly piece.
+                else {break;}
             }
             return moveList;
         }
@@ -97,12 +149,22 @@ public class ChessPiece {
                     new ChessPosition(0, 1), new ChessPosition(0, -1),new ChessPosition(1, 1),
                     new ChessPosition(1, -1), new ChessPosition(-1, 1),new ChessPosition(-1, -1));
             for ( ChessPosition moves : potentialKingMoves) {
-                //Need to alter the code so that instead of i, it adds the first / second number of the pair in the list
-                //Also need to check if the adjacent pieces that are capturable are adjacent or not.
-                if (startPosition.getRow() + moves.getRow() < 0 || startPosition.getRow() + moves.getRow() >= 8 ||
-                        startPosition.getColumn() + moves.getColumn() < 0 || startPosition.getColumn() + moves.getColumn() >= 8) {continue;}
-                else {
-                    moveList.add(new ChessMove(startPosition,new ChessPosition(startPosition.getRow() + moves.getRow(), startPosition.getColumn() + moves.getColumn()),null));
+                int newRow = startPosition.getRow() + moves.getRow();
+                int newCol = startPosition.getColumn() + moves.getColumn();
+                if (startPosition.getRow() + moves.getRow() < 1 || startPosition.getRow() + moves.getRow() > 8 ||
+                        startPosition.getColumn() + moves.getColumn() < 1 || startPosition.getColumn() + moves.getColumn() > 8) {
+                    continue;
+                }
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+                ChessPiece adjacentPiece = board.getPiece(newPosition);
+
+                //Free spot, good to go.
+                if (adjacentPiece == null) {
+                    moveList.add(new ChessMove(startPosition, newPosition, null));
+                }
+                //Capturing an enemy piece
+                else if (adjacentPiece.getTeamColor() != this.pieceColor) {
+                    moveList.add(new ChessMove(startPosition, newPosition, null));
                 }
             }
             return moveList;
@@ -111,87 +173,427 @@ public class ChessPiece {
             List<ChessPosition> potentialKnightMoves = List.of(new ChessPosition(2, 1), new ChessPosition(1, 2),
                     new ChessPosition(2, -1),new ChessPosition(1, -2),new ChessPosition(-2, 1),
                     new ChessPosition(-1, 2),new ChessPosition(-2, -1),new ChessPosition(-1, -2));
-            for (ChessPosition move : potentialKnightMoves) {
-                if (startPosition.getRow() + move.getRow() <= 0 || startPosition.getRow() + move.getRow() >= 8 ||
-                        startPosition.getColumn() + move.getColumn() <= 0 || startPosition.getColumn() + move.getColumn() >= 8) {continue;}
-                else {
-                    moveList.add(new ChessMove(startPosition,new ChessPosition(startPosition.getRow() + move.getRow(), startPosition.getColumn() + move.getColumn()),null));
+            for (ChessPosition moves : potentialKnightMoves) {
+                int newRow = startPosition.getRow() + moves.getRow();
+                int newCol = startPosition.getColumn() + moves.getColumn();
+                if (startPosition.getRow() + moves.getRow() < 1 || startPosition.getRow() + moves.getRow() > 8 ||
+                        startPosition.getColumn() + moves.getColumn() < 1 || startPosition.getColumn() + moves.getColumn() > 8) {
+                    continue;
+                }
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+                ChessPiece adjacentPiece = board.getPiece(newPosition);
+                //Free spot, good to go.
+                if (adjacentPiece == null) {
+                    moveList.add(new ChessMove(startPosition, newPosition, null));
+                }
+                //Capturing an enemy piece
+                else if (adjacentPiece.getTeamColor() != this.pieceColor) {
+                    moveList.add(new ChessMove(startPosition, newPosition, null));
                 }
             }
             return moveList;
         }
+        //What should I put instead of null at the promotion piece spot?
         else if (this.type == ChessPiece.PieceType.PAWN) {
-            if (startPosition.getRow() == 7 && this.getTeamColor() == ChessGame.TeamColor.WHITE){
-                moveList.add(new ChessMove(startPosition,new ChessPosition(startPosition.getRow()-1,startPosition.getColumn()),null));
-                moveList.add(new ChessMove(startPosition,new ChessPosition(startPosition.getRow()-2,startPosition.getColumn()),null));
+            if (this.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                // WHITE pawns move UP (row increases: 2 -> 3 -> 4...)
+
+                // Move forward one square
+                if (startPosition.getRow() < 8) {
+                    ChessPosition oneForward = new ChessPosition(startPosition.getRow() + 1, startPosition.getColumn());
+                    ChessPiece pieceAhead = board.getPiece(oneForward);
+
+                    if (pieceAhead == null) {  // Square must be empty
+                        if (startPosition.getRow() + 1 == 8) {  // Promotion
+                            moveList.add(new ChessMove(startPosition, oneForward, PieceType.QUEEN));
+                            moveList.add(new ChessMove(startPosition, oneForward, PieceType.ROOK));
+                            moveList.add(new ChessMove(startPosition, oneForward, PieceType.BISHOP));
+                            moveList.add(new ChessMove(startPosition, oneForward, PieceType.KNIGHT));
+                        } else {
+                            moveList.add(new ChessMove(startPosition, oneForward, null));
+                        }
+
+                        // Double move from starting position
+                        if (startPosition.getRow() == 2) {
+                            ChessPosition twoForward = new ChessPosition(startPosition.getRow() + 2, startPosition.getColumn());
+                            ChessPiece pieceTwoAhead = board.getPiece(twoForward);
+                            if (pieceTwoAhead == null) {
+                                moveList.add(new ChessMove(startPosition, twoForward, null));
+                            }
+                        }
+                    }
+                }
+
+                // Diagonal capture left
+                if (startPosition.getRow() < 8 && startPosition.getColumn() > 1) {
+                    ChessPosition diagLeft = new ChessPosition(startPosition.getRow() + 1, startPosition.getColumn() - 1);
+                    ChessPiece pieceLeft = board.getPiece(diagLeft);
+
+                    if (pieceLeft != null && pieceLeft.getTeamColor() != this.pieceColor) {
+                        if (startPosition.getRow() + 1 == 8) {  // Promotion
+                            moveList.add(new ChessMove(startPosition, diagLeft, PieceType.QUEEN));
+                            moveList.add(new ChessMove(startPosition, diagLeft, PieceType.ROOK));
+                            moveList.add(new ChessMove(startPosition, diagLeft, PieceType.BISHOP));
+                            moveList.add(new ChessMove(startPosition, diagLeft, PieceType.KNIGHT));
+                        } else {
+                            moveList.add(new ChessMove(startPosition, diagLeft, null));
+                        }
+                    }
+                }
+
+                // Diagonal capture right
+                if (startPosition.getRow() < 8 && startPosition.getColumn() < 8) {
+                    ChessPosition diagRight = new ChessPosition(startPosition.getRow() + 1, startPosition.getColumn() + 1);
+                    ChessPiece pieceRight = board.getPiece(diagRight);
+
+                    if (pieceRight != null && pieceRight.getTeamColor() != this.pieceColor) {
+                        if (startPosition.getRow() + 1 == 8) {  // Promotion
+                            moveList.add(new ChessMove(startPosition, diagRight, PieceType.QUEEN));
+                            moveList.add(new ChessMove(startPosition, diagRight, PieceType.ROOK));
+                            moveList.add(new ChessMove(startPosition, diagRight, PieceType.BISHOP));
+                            moveList.add(new ChessMove(startPosition, diagRight, PieceType.KNIGHT));
+                        } else {
+                            moveList.add(new ChessMove(startPosition, diagRight, null));
+                        }
+                    }
+                }
             }
-            else if (this.getTeamColor() == ChessGame.TeamColor.WHITE && startPosition.getRow() != 1){
-                moveList.add(new ChessMove(startPosition,new ChessPosition(startPosition.getRow()-1,startPosition.getColumn()),null));
+            else if (this.getTeamColor() == ChessGame.TeamColor.BLACK) {
+                // BLACK pawns move DOWN (row decreases: 7 -> 6 -> 5...)
+
+                // Move forward one square
+                if (startPosition.getRow() > 1) {
+                    ChessPosition oneForward = new ChessPosition(startPosition.getRow() - 1, startPosition.getColumn());
+                    ChessPiece pieceAhead = board.getPiece(oneForward);
+
+                    if (pieceAhead == null) {  // Square must be empty
+                        if (startPosition.getRow() - 1 == 1) {  // Promotion
+                            moveList.add(new ChessMove(startPosition, oneForward, PieceType.QUEEN));
+                            moveList.add(new ChessMove(startPosition, oneForward, PieceType.ROOK));
+                            moveList.add(new ChessMove(startPosition, oneForward, PieceType.BISHOP));
+                            moveList.add(new ChessMove(startPosition, oneForward, PieceType.KNIGHT));
+                        } else {
+                            moveList.add(new ChessMove(startPosition, oneForward, null));
+                        }
+
+                        // Double move from starting position
+                        if (startPosition.getRow() == 7) {
+                            ChessPosition twoForward = new ChessPosition(startPosition.getRow() - 2, startPosition.getColumn());
+                            ChessPiece pieceTwoAhead = board.getPiece(twoForward);
+                            if (pieceTwoAhead == null) {
+                                moveList.add(new ChessMove(startPosition, twoForward, null));
+                            }
+                        }
+                    }
+                }
+
+                // Diagonal capture left
+                if (startPosition.getRow() > 1 && startPosition.getColumn() > 1) {
+                    ChessPosition diagLeft = new ChessPosition(startPosition.getRow() - 1, startPosition.getColumn() - 1);
+                    ChessPiece pieceLeft = board.getPiece(diagLeft);
+
+                    if (pieceLeft != null && pieceLeft.getTeamColor() != this.pieceColor) {
+                        if (startPosition.getRow() - 1 == 1) {  // Promotion
+                            moveList.add(new ChessMove(startPosition, diagLeft, PieceType.QUEEN));
+                            moveList.add(new ChessMove(startPosition, diagLeft, PieceType.ROOK));
+                            moveList.add(new ChessMove(startPosition, diagLeft, PieceType.BISHOP));
+                            moveList.add(new ChessMove(startPosition, diagLeft, PieceType.KNIGHT));
+                        } else {
+                            moveList.add(new ChessMove(startPosition, diagLeft, null));
+                        }
+                    }
+                }
+
+                // Diagonal capture right
+                if (startPosition.getRow() > 1 && startPosition.getColumn() < 8) {
+                    ChessPosition diagRight = new ChessPosition(startPosition.getRow() - 1, startPosition.getColumn() + 1);
+                    ChessPiece pieceRight = board.getPiece(diagRight);
+
+                    if (pieceRight != null && pieceRight.getTeamColor() != this.pieceColor) {
+                        if (startPosition.getRow() - 1 == 1) {  // Promotion
+                            moveList.add(new ChessMove(startPosition, diagRight, PieceType.QUEEN));
+                            moveList.add(new ChessMove(startPosition, diagRight, PieceType.ROOK));
+                            moveList.add(new ChessMove(startPosition, diagRight, PieceType.BISHOP));
+                            moveList.add(new ChessMove(startPosition, diagRight, PieceType.KNIGHT));
+                        } else {
+                            moveList.add(new ChessMove(startPosition, diagRight, null));
+                        }
+                    }
+                }
             }
-            else if (startPosition.getRow() == 2 && this.getTeamColor() == ChessGame.TeamColor.BLACK){
-                moveList.add(new ChessMove(startPosition,new ChessPosition(startPosition.getRow()+1,startPosition.getColumn()),null));
-                moveList.add(new ChessMove(startPosition,new ChessPosition(startPosition.getRow()+2,startPosition.getColumn()),null));
-            }
-            else if (this.getTeamColor() == ChessGame.TeamColor.BLACK && startPosition.getRow() != 8){
-                moveList.add(new ChessMove(startPosition,new ChessPosition(startPosition.getRow()+1,startPosition.getColumn()),null));
-            }
-            return moveList;
         }
+
         else if (this.type == ChessPiece.PieceType.QUEEN) {
             //Bishop Moves
+            //Going Down, Right
             for (int i = 1; i < 8; i++) {
-                if (startPosition.getRow() + i >= 8 || startPosition.getColumn() + i >= 8) {continue;}
-                else {
-                    moveList.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow() + i,startPosition.getColumn() + i), null));
+                int newRow = startPosition.getRow() + i;
+                int newCol = startPosition.getColumn() + i;
+                if (newRow > 8 || newCol > 8){break;}
+                ChessPosition newPosition = new ChessPosition(newRow,newCol);
+                ChessPiece adjacentPiece = board.getPiece(newPosition);
+                //Free spot, good to go.
+                if (adjacentPiece == null){
+                    moveList.add(new ChessMove(startPosition, newPosition,null));
                 }
+                //Capturing an enemy piece
+                else if (adjacentPiece.getTeamColor() != this.pieceColor){
+                    moveList.add(new ChessMove(startPosition, newPosition,null));
+                    break;
+                }
+                //This is a friendly piece.
+                else {break;}
+
             }
+            //Going Up, Left
             for (int i = 1; i < 8; i++) {
-                if (startPosition.getRow() + i >= 8 || startPosition.getColumn() - i <= 0) {continue;}
-                else {
-                    moveList.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow() + i,startPosition.getColumn() - i), null));
+                int newRow = startPosition.getRow() + i;
+                int newCol = startPosition.getColumn() - i;
+                if (newRow > 8 || newCol < 1){break;}
+                ChessPosition newPosition = new ChessPosition(newRow,newCol);
+                ChessPiece adjacentPiece = board.getPiece(newPosition);
+                //Free spot, good to go.
+                if (adjacentPiece == null){
+                    moveList.add(new ChessMove(startPosition, newPosition,null));
                 }
+                //Capturing an enemy piece
+                else if (adjacentPiece.getTeamColor() != this.pieceColor){
+                    moveList.add(new ChessMove(startPosition, newPosition,null));
+                    break;
+                }
+                //This is a friendly piece.
+                else {break;}
             }
+            //Going Down, right
             for (int i = 1; i < 8; i++) {
-                if (startPosition.getRow() - i <= 0 || startPosition.getColumn() + i >= 8) {continue;}
-                else {
-                    moveList.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow() - i,startPosition.getColumn() + i), null));
+                int newRow = startPosition.getRow() - i;
+                int newCol = startPosition.getColumn() + i;
+                if (newRow < 1 || newCol > 8){break;}
+                ChessPosition newPosition = new ChessPosition(newRow,newCol);
+                ChessPiece adjacentPiece = board.getPiece(newPosition);
+
+                //Free spot, good to go.
+                if (adjacentPiece == null){
+                    moveList.add(new ChessMove(startPosition, newPosition,null));
                 }
+                //Capturing an enemy piece
+                else if (adjacentPiece.getTeamColor() != this.pieceColor){
+                    moveList.add(new ChessMove(startPosition, newPosition,null));
+                    break;
+                }
+                //This is a friendly piece.
+                else {break;}
             }
+            //Going Down, left
             for (int i = 1; i < 8; i++) {
-                if (startPosition.getRow() - i <= 0 || startPosition.getColumn() - i <= 0 ) {continue;}
-                else {
-                    moveList.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow() - i,startPosition.getColumn() - i), null));
+                int newRow = startPosition.getRow() - i;
+                int newCol = startPosition.getColumn() - i;
+                if (newRow < 1 || newCol < 1){break;}
+                ChessPosition newPosition = new ChessPosition(newRow,newCol);
+                ChessPiece adjacentPiece = board.getPiece(newPosition);
+
+                //Free spot, good to go.
+                if (adjacentPiece == null){
+                    moveList.add(new ChessMove(startPosition, newPosition,null));
                 }
+                //Capturing an enemy piece
+                else if (adjacentPiece.getTeamColor() != this.pieceColor){
+                    moveList.add(new ChessMove(startPosition, newPosition,null));
+                    break;
+                }
+                //This is a friendly piece.
+                else {break;}
             }
             //Rook Moves
-            for (int i = -7; i < 8; i++) {
-                if (startPosition.getRow() + i <= 0 || startPosition.getRow() + i >= 8) {continue;}
+            //Going up the board, row subtraction
+            for (int i = 1; i < 8; i++) {
+                int newRow = startPosition.getRow() - i;
+                int newCol = startPosition.getColumn();
+                if (newRow < 1) {
+                    break;
+                }
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+                ChessPiece adjacentPiece = board.getPiece(newPosition);
+                //Free spot, good to go.
+                if (adjacentPiece == null) {
+                    moveList.add(new ChessMove(startPosition, newPosition, null));
+                }
+                //Capturing an enemy piece
+                else if (adjacentPiece.getTeamColor() != this.pieceColor) {
+                    moveList.add(new ChessMove(startPosition, newPosition, null));
+                    break;
+                }
+                //This is a friendly piece.
                 else {
-                    moveList.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow() + i,startPosition.getColumn()), null));
+                    break;
                 }
             }
-            for (int i = -7; i < 8; i++) {
-                if (startPosition.getColumn() + i <= 0 || startPosition.getColumn() +i >= 8) {continue;}
+            //Going down the board row addition
+            for (int i = 1; i < 8; i++) {
+                int newRow = startPosition.getRow() + i;
+                int newCol = startPosition.getColumn();
+                if (newRow > 8) {
+                    break;
+                }
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+                ChessPiece adjacentPiece = board.getPiece(newPosition);
+                //Free spot, good to go.
+                if (adjacentPiece == null) {
+                    moveList.add(new ChessMove(startPosition, newPosition, null));
+                }
+                //Capturing an enemy piece
+                else if (adjacentPiece.getTeamColor() != this.pieceColor) {
+                    moveList.add(new ChessMove(startPosition, newPosition, null));
+                    break;
+                }
+                //This is a friendly piece.
                 else {
-                    moveList.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow(),startPosition.getColumn() + i), null));
+                    break;
+                }
+            }
+            //Going Right column addition
+            for (int i = 1; i < 8; i++) {
+                int newRow = startPosition.getRow();
+                int newCol = startPosition.getColumn() + i;
+                if (newCol > 8) {
+                    break;
+                }
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+                ChessPiece adjacentPiece = board.getPiece(newPosition);
+                //Free spot, good to go.
+                if (adjacentPiece == null) {
+                    moveList.add(new ChessMove(startPosition, newPosition, null));
+                }
+                //Capturing an enemy piece
+                else if (adjacentPiece.getTeamColor() != this.pieceColor) {
+                    moveList.add(new ChessMove(startPosition, newPosition, null));
+                    break;
+                }
+                //This is a friendly piece.
+                else {
+                    break;
+                }
+            }
+            //Going Left subtracting Column
+            for (int i = 1; i < 8; i++) {
+                int newRow = startPosition.getRow();
+                int newCol = startPosition.getColumn() - i;
+                if (newCol < 1) {
+                    break;
+                }
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+                ChessPiece adjacentPiece = board.getPiece(newPosition);
+                //Free spot, good to go.
+                if (adjacentPiece == null) {
+                    moveList.add(new ChessMove(startPosition, newPosition, null));
+                }
+                //Capturing an enemy piece
+                else if (adjacentPiece.getTeamColor() != this.pieceColor) {
+                    moveList.add(new ChessMove(startPosition, newPosition, null));
+                    break;
+                }
+                //This is a friendly piece.
+                else {
+                    break;
                 }
             }
 
             return moveList;
         }
         else if (this.type == ChessPiece.PieceType.ROOK) {
-            for (int i = -7; i < 8; i++) {
-                if (startPosition.getRow() + i <= 0 || startPosition.getRow() + i >= 8) {continue;}
+            //Going up the board row subtraction
+            for (int i = 1; i < 8; i++) {
+                int newRow = startPosition.getRow() - i;
+                int newCol = startPosition.getColumn();
+                if (newRow < 1) {
+                    break;
+                }
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+                ChessPiece adjacentPiece = board.getPiece(newPosition);
+                //Free spot, good to go.
+                if (adjacentPiece == null) {
+                    moveList.add(new ChessMove(startPosition, newPosition, null));
+                }
+                //Capturing an enemy piece
+                else if (adjacentPiece.getTeamColor() != this.pieceColor) {
+                    moveList.add(new ChessMove(startPosition, newPosition, null));
+                    break;
+                }
+                //This is a friendly piece.
                 else {
-                    moveList.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow() + i,startPosition.getColumn()), null));
+                    break;
                 }
             }
-            for (int i = -7; i < 8; i++) {
-                if (startPosition.getColumn() + i <= 0 || startPosition.getColumn() +i >= 8) {continue;}
+            //Going down the board row addition
+            for (int i = 1; i < 8; i++) {
+                int newRow = startPosition.getRow() + i;
+                int newCol = startPosition.getColumn();
+                if (newRow > 8) {
+                    break;
+                }
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+                ChessPiece adjacentPiece = board.getPiece(newPosition);
+                //Free spot, good to go.
+                if (adjacentPiece == null) {
+                    moveList.add(new ChessMove(startPosition, newPosition, null));
+                }
+                //Capturing an enemy piece
+                else if (adjacentPiece.getTeamColor() != this.pieceColor) {
+                    moveList.add(new ChessMove(startPosition, newPosition, null));
+                    break;
+                }
+                //This is a friendly piece.
                 else {
-                    moveList.add(new ChessMove(startPosition, new ChessPosition(startPosition.getRow(),startPosition.getColumn() + i), null));
+                    break;
                 }
             }
+            //Going Right column addition
+            for (int i = 1; i < 8; i++) {
+                int newRow = startPosition.getRow();
+                int newCol = startPosition.getColumn() + i;
+                if (newCol > 8) {
+                    break;
+                }
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+                ChessPiece adjacentPiece = board.getPiece(newPosition);
+                //Free spot, good to go.
+                if (adjacentPiece == null) {
+                    moveList.add(new ChessMove(startPosition, newPosition, null));
+                }
+                //Capturing an enemy piece
+                else if (adjacentPiece.getTeamColor() != this.pieceColor) {
+                    moveList.add(new ChessMove(startPosition, newPosition, null));
+                    break;
+                }
+                //This is a friendly piece.
+                else {
+                    break;
+                }
+            }
+            //Going Left subtracting Column
+            for (int i = 1; i < 8; i++) {
+                int newRow = startPosition.getRow();
+                int newCol = startPosition.getColumn() - i;
+                if (newCol < 1) {
+                    break;
+                }
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+                ChessPiece adjacentPiece = board.getPiece(newPosition);
+                //Free spot, good to go.
+                if (adjacentPiece == null) {
+                    moveList.add(new ChessMove(startPosition, newPosition, null));
+                }
+                //Capturing an enemy piece
+                else if (adjacentPiece.getTeamColor() != this.pieceColor) {
+                    moveList.add(new ChessMove(startPosition, newPosition, null));
+                    break;
+                }
+                //This is a friendly piece.
+                else {
+                    break;
+                }
+            }
+            return moveList;
         }
         else {
             throw new RuntimeException("INVALID PIECE! WHAT DID YOU DO?!?!");
