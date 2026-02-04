@@ -1,6 +1,7 @@
 package passoff.chess.game;
 
 import chess.ChessGame;
+import chess.ChessGameBuilder;
 import chess.ChessMove;
 import chess.ChessPosition;
 import org.junit.jupiter.api.Assertions;
@@ -18,7 +19,7 @@ public class ValidMovesTests {
     @DisplayName("Check Forces Movement")
     public void forcedMove() {
 
-        var game = new ChessGame();
+        var game = new ChessGameBuilder().createChessGame();
         game.setTeamTurn(ChessGame.TeamColor.BLACK);
         game.setBoard(TestUtilities.loadBoard("""
                     | | | | | | | | |
@@ -47,7 +48,7 @@ public class ValidMovesTests {
     @DisplayName("Piece Partially Trapped")
     public void moveIntoCheck() {
 
-        var game = new ChessGame();
+        var game = new ChessGameBuilder().createChessGame();
         game.setBoard(TestUtilities.loadBoard("""
                     | | | | | | | | |
                     | | | | | | | | |
@@ -71,7 +72,7 @@ public class ValidMovesTests {
     @DisplayName("Piece Completely Trapped")
     public void rookPinnedToKing() {
 
-        var game = new ChessGame();
+        var game = new ChessGameBuilder().createChessGame();
         game.setBoard(TestUtilities.loadBoard("""
                     |K| | | | | | |Q|
                     | | | | | | | | |
@@ -92,7 +93,7 @@ public class ValidMovesTests {
     @DisplayName("Pieces Cannot Eliminate Check")
     public void kingInDanger() {
 
-        var game = new ChessGame();
+        var game = new ChessGameBuilder().createChessGame();
         game.setTeamTurn(ChessGame.TeamColor.BLACK);
         game.setBoard(TestUtilities.loadBoard("""
                     |R| | | | | | | |
@@ -131,7 +132,7 @@ public class ValidMovesTests {
     @DisplayName("King Cannot Move Into Check")
     public void noPutSelfInDanger() {
 
-        var game = new ChessGame();
+        var game = new ChessGameBuilder().createChessGame();
         game.setBoard(TestUtilities.loadBoard("""
                     | | | | | | | | |
                     | | | | | | | | |
@@ -153,7 +154,7 @@ public class ValidMovesTests {
     @Test
     @DisplayName("Valid Moves Independent of Team Turn")
     public void validMovesOtherTeam() {
-        var game = new ChessGame();
+        var game = new ChessGameBuilder().createChessGame();
         game.setBoard(TestUtilities.defaultBoard());
         game.setTeamTurn(ChessGame.TeamColor.BLACK);
 

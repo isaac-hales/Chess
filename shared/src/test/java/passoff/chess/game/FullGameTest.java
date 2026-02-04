@@ -1,9 +1,6 @@
 package passoff.chess.game;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPosition;
-import chess.InvalidMoveException;
+import chess.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,7 +9,7 @@ public class FullGameTest {
     @Test
     @DisplayName("Full Game Checkmate")
     public void scholarsMate() throws InvalidMoveException {
-        var game = new ChessGame();
+        var game = new ChessGameBuilder().createChessGame();
         game.makeMove(new ChessMove(new ChessPosition(2, 5), new ChessPosition(4, 5), null));
         /*
                 |r|n|b|q|k|b|n|r|

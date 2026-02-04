@@ -303,7 +303,7 @@ public class CastlingTests {
 
     private ChessGame createNewGameWithBoard(String boardText, ChessGame.TeamColor teamTurn) {
         ChessBoard board = TestUtilities.loadBoard(boardText);
-        ChessGame game = new ChessGame();
+        ChessGame game = new ChessGameBuilder().createChessGame();
         game.setBoard(board);
         game.setTeamTurn(teamTurn);
         return game;

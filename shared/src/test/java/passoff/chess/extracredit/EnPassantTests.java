@@ -190,7 +190,7 @@ public class EnPassantTests {
                 | | | | | | | | |
                 | | | |K| | | | |
                 """);
-        ChessGame game = new ChessGame();
+        ChessGame game = new ChessGameBuilder().createChessGame();
         game.setBoard(board);
         game.setTeamTurn(ChessGame.TeamColor.BLACK);
 
@@ -230,7 +230,7 @@ public class EnPassantTests {
 
     private void assertValidEnPassant(ChessBoard board, ChessGame.TeamColor turn, ChessMove setupMove,
                                       ChessMove enPassantMove, ChessBoard endBoard) throws InvalidMoveException {
-        ChessGame game = new ChessGame();
+        ChessGame game = new ChessGameBuilder().createChessGame();
         game.setBoard(board);
         game.setTeamTurn(turn);
 

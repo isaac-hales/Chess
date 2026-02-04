@@ -15,7 +15,7 @@ public class MakeMoveTests {
 
     @BeforeEach
     public void setUp() {
-        game = new ChessGame();
+        game = new ChessGameBuilder().createChessGame();
         game.setTeamTurn(ChessGame.TeamColor.WHITE);
         game.setBoard(TestUtilities.defaultBoard());
     }

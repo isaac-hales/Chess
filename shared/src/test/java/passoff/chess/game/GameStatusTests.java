@@ -1,6 +1,7 @@
 package passoff.chess.game;
 
 import chess.ChessGame;
+import chess.ChessGameBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,7 @@ public class GameStatusTests {
     @Test
     @DisplayName("New Game Default Values")
     public void newGame() {
-        var game = new ChessGame();
+        var game = new ChessGameBuilder().createChessGame();
         var expectedBoard = TestUtilities.defaultBoard();
         Assertions.assertEquals(expectedBoard, game.getBoard(), "Incorrect starting board");
         Assertions.assertEquals(ChessGame.TeamColor.WHITE, game.getTeamTurn(), "Incorrect starting team turn");
@@ -31,7 +32,7 @@ public class GameStatusTests {
     @Test
     @DisplayName("Default Board No Statuses")
     public void noGameStatuses() {
-        var game = new ChessGame();
+        var game = new ChessGameBuilder().createChessGame();
         game.setBoard(TestUtilities.defaultBoard());
         game.setTeamTurn(ChessGame.TeamColor.WHITE);
 
@@ -47,7 +48,7 @@ public class GameStatusTests {
     @Test
     @DisplayName("White in Check")
     public void whiteCheck() {
-        var game = new ChessGame();
+        var game = new ChessGameBuilder().createChessGame();
         game.setBoard(TestUtilities.loadBoard("""
                 | | | | | | | |k|
                 | | | | | | | | |
@@ -67,7 +68,7 @@ public class GameStatusTests {
     @Test
     @DisplayName("Black in Check")
     public void blackCheck() {
-        var game = new ChessGame();
+        var game = new ChessGameBuilder().createChessGame();
         game.setBoard(TestUtilities.loadBoard("""
                 | | | |K| | | | |
                 | | | | | | | | |
@@ -88,7 +89,7 @@ public class GameStatusTests {
     @DisplayName("White in Checkmate")
     public void whiteTeamCheckmate() {
 
-        var game = new ChessGame();
+        var game = new ChessGameBuilder().createChessGame();
         game.setBoard(TestUtilities.loadBoard("""
                 | | | | | | | | |
                 | | |b|q| | | | |
@@ -109,7 +110,7 @@ public class GameStatusTests {
     @Test
     @DisplayName("Black in Checkmate by Pawns")
     public void blackTeamPawnCheckmate() {
-        var game = new ChessGame();
+        var game = new ChessGameBuilder().createChessGame();
         game.setBoard(TestUtilities.loadBoard("""
                 | | | |k| | | | |
                 | | | |P|P| | | |
@@ -131,7 +132,7 @@ public class GameStatusTests {
     @DisplayName("Black can escape Check by capturing")
     public void escapeCheckByCapturingThreateningPiece() {
 
-        var game = new ChessGame();
+        var game = new ChessGameBuilder().createChessGame();
         game.setBoard(TestUtilities.loadBoard("""
                 | | | | | |r|k| |
                 | | | | | |P| |p|
@@ -153,7 +154,7 @@ public class GameStatusTests {
     @DisplayName("Black CANNOT escape Check by capturing")
     public void cannotEscapeCheckByCapturingThreateningPiece() {
 
-        var game = new ChessGame();
+        var game = new ChessGameBuilder().createChessGame();
         game.setBoard(TestUtilities.loadBoard("""
                 | | | | | |r|k| |
                 | | | | | |P| |p|
@@ -175,7 +176,7 @@ public class GameStatusTests {
     @DisplayName("Checkmate, where blocking a threat reveals a new threat")
     public void checkmateWhereBlockingThreateningPieceOpensNewThreat() {
 
-        var game = new ChessGame();
+        var game = new ChessGameBuilder().createChessGame();
         game.setBoard(TestUtilities.loadBoard("""
                 | | | | | | |r|k|
                 | | |R| | | | | |
@@ -196,7 +197,7 @@ public class GameStatusTests {
     @Test
     @DisplayName("Pinned King Causes Stalemate")
     public void stalemate() {
-        var game = new ChessGame();
+        var game = new ChessGameBuilder().createChessGame();
         game.setBoard(TestUtilities.loadBoard("""
                 |k| | | | | | | |
                 | | | | | | | |r|
@@ -216,7 +217,7 @@ public class GameStatusTests {
     @Test
     @DisplayName("Stalemate Requires not in Check")
     public void checkmateNotStalemate() {
-        var game = new ChessGame();
+        var game = new ChessGameBuilder().createChessGame();
         game.setBoard(TestUtilities.loadBoard("""
                 |k| | | | | | | |
                 | | | | | | | | |

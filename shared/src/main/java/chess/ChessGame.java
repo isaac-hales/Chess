@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -9,16 +10,21 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessGame {
+    //I think this is how we get a board in starting position
+    ChessBoard gameBoard = new ChessBoard();
+    TeamColor turnTracker;
+    //int turnCounter;
 
+    //This is a constructor, so any function that we need to run at the start, we run here.
     public ChessGame() {
-
+        turnTracker = TeamColor.WHITE; //First turn belongs to white team.
     }
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+        return turnTracker;
     }
 
     /**
@@ -27,7 +33,9 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
+        //Does it advance it by one? If it didn't advance it by one, then what would it do?
         throw new RuntimeException("Not implemented");
+
     }
 
     /**
@@ -46,7 +54,19 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+
+        ChessPiece tempPiece = gameBoard.getPiece(startPosition);
+        if (tempPiece == null){
+            return null;
+        }
+        final ArrayList<ChessMove> potentialMoves = pieceMoves(startPosition,gameBoard,tempPiece);
+        for ( ChessMove move : pieceMoves){
+            //Checking if the piece is in check / checkmate
+            if (isInCheck(tempPiece.pieceColor) || isInCheckmate(tempPiece.pieceColor)){
+                potentialMoves.remove(move);
+            }
+        }
+        return potentialMoves;
     }
 
     /**
@@ -57,6 +77,8 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         throw new RuntimeException("Not implemented");
+        //Ask TA's suggestions of how to make moves. Should it be with Algabraic notation?
+        //Or is there a better way to implement it? I really don't know.
     }
 
     /**
@@ -67,6 +89,8 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         throw new RuntimeException("Not implemented");
+        //Get the movelist of all pieces of opposing color, and then see if any of the moves include the teamColor king piece
+        //So run validMoves, and then check if any of the pieces is
     }
 
     /**
@@ -88,6 +112,7 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         throw new RuntimeException("Not implemented");
+        //Similar code to Checkmate function.
     }
 
     /**
@@ -96,7 +121,16 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
+        //I think it's setting any board if given one.
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j < 9; j++){
+                ChessPosition tempPosition = new ChessPosition(i,j);
+                ChessPiece tempPiece = board.getPiece(tempPosition);
+                gameBoard.addPiece(tempPosition,tempPiece);
+            }
+        }
         throw new RuntimeException("Not implemented");
+
     }
 
     /**
@@ -105,6 +139,8 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return gameBoard;
     }
+
+
 }
