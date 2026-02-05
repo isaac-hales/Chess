@@ -57,7 +57,8 @@ public class ChessPiece {
      */
     //Update to get all the different pieces
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return PieceMoveCalculator.calculateMoves(myPosition, board, board.getPiece(myPosition));
+        PieceMoveCalculator moveList = new PieceMoveCalculator();
+        return moveList.calculateMoves(myPosition, board, board.getPiece(myPosition));
     }
 
     //Move it to its own class, for better code quality.

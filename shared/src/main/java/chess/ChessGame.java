@@ -10,21 +10,21 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessGame {
-    //I think this is how we get a board in starting position
     ChessBoard gameBoard = new ChessBoard();
-    TeamColor turnTracker;
+    TeamColor teamTurn; 
     //int turnCounter;
 
     //This is a constructor, so any function that we need to run at the start, we run here.
     public ChessGame() {
-        turnTracker = TeamColor.WHITE; //First turn belongs to white team.
+        gameBoard.resetBoard(); //Is this a mistake, in case we want to set up other boards?
+        teamTurn = TeamColor.WHITE; //First turn belongs to white team.
     }
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        return turnTracker;
+        return teamTurn;
     }
 
     /**
@@ -33,9 +33,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        //Does it advance it by one? If it didn't advance it by one, then what would it do?
-        throw new RuntimeException("Not implemented");
-
+        teamTurn = team;
     }
 
     /**
@@ -59,8 +57,9 @@ public class ChessGame {
         if (tempPiece == null){
             return null;
         }
-        final ArrayList<ChessMove> potentialMoves = pieceMoves(startPosition,gameBoard,tempPiece);
-        for ( ChessMove move : pieceMoves){
+
+        final ArrayList<ChessMove> potentialMoves = (ArrayList<ChessMove>) tempPiece.pieceMoves(gameBoard,startPosition);
+        for (ChessMove move : potentialMoves){
             //Checking if the piece is in check / checkmate
             if (isInCheck(tempPiece.pieceColor) || isInCheckmate(tempPiece.pieceColor)){
                 potentialMoves.remove(move);
@@ -77,9 +76,9 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         throw new RuntimeException("Not implemented");
-        //Ask TA's suggestions of how to make moves. Should it be with Algabraic notation?
-        //Or is there a better way to implement it? I really don't know.
-    }
+        // The computer will just input a move in the parameter.
+        //Run isInCheck and isInCheckmate on own color to check for legality
+        }
 
     /**
      * Determines if the given team is in check
@@ -112,7 +111,8 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         throw new RuntimeException("Not implemented");
-        //Similar code to Checkmate function.
+        //Similar code to Checkmate function, only difference is that this code returns true if the king is NOT in danger, but
+        //surrounding squares are.
     }
 
     /**
@@ -121,7 +121,6 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        //I think it's setting any board if given one.
         for (int i = 1; i < 9; i++){
             for (int j = 1; j < 9; j++){
                 ChessPosition tempPosition = new ChessPosition(i,j);
