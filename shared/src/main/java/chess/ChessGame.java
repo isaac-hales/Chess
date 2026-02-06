@@ -52,15 +52,36 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-
         ChessPiece tempPiece = gameBoard.getPiece(startPosition);
         if (tempPiece == null){
             return null;
         }
-        final ArrayList<ChessMove> potentialMoves = (ArrayList<ChessMove>) tempPiece.pieceMoves(gameBoard,startPosition);
-        //Checking if the piece is in check / checkmate, and if so, it will be removed.
-        potentialMoves.removeIf(move -> isInCheck(tempPiece.pieceColor) || isInCheckmate(tempPiece.pieceColor));
-        return potentialMoves;
+        //We're getting all of the moves that the piece can make, regardless of check / checkmate.
+        Collection<ChessMove> potentialMoves = tempPiece.pieceMoves(gameBoard, startPosition);
+        ArrayList<ChessMove> legalMoves = new ArrayList<>();
+
+        //Now we're going through each move, and checking if it leaves out king in check / checkmate.
+        for (ChessMove move : potentialMoves) {
+            ChessPiece capturedPiece = gameBoard.getPiece(move.getEndPosition());
+
+            //Making the move on the board
+            gameBoard.addPiece(move.getEndPosition(), tempPiece);
+            gameBoard.addPiece(move.getStartPosition(), null);
+
+            //checking if the king is in check.
+            boolean kingInCheck = isInCheck(tempPiece.getTeamColor());
+
+            //Undoing the move.
+            gameBoard.addPiece(move.getStartPosition(), tempPiece);
+            //Putting the capturedPiece back in its original position.
+            gameBoard.addPiece(move.getEndPosition(), capturedPiece);
+            //Adding it if the king is not in check.
+            if (!kingInCheck) {
+                legalMoves.add(move);
+            }
+        }
+
+        return legalMoves;
     }
 
     /**
@@ -71,7 +92,9 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece tempPiece = gameBoard.getPiece(move.getStartPosition());
-        if (tempPiece == null){return;}
+        if (tempPiece == null){
+            throw new InvalidMoveException("No piece was selected. ");
+        }
         final ArrayList<ChessMove> potentialMoves = (ArrayList<ChessMove>) validMoves(move.getStartPosition());
         if (tempPiece.getTeamColor() != getTeamTurn()){
             throw new InvalidMoveException("It is not currently " + tempPiece.getTeamColor()+"s turn yet.");
@@ -112,7 +135,7 @@ public class ChessGame {
                 }
                 else if (gameBoard.getPiece(tempPosition).getTeamColor() != teamColor) {
                     ChessPiece tempPiece = gameBoard.getPiece(tempPosition);
-                    opposingMoves = (ArrayList<ChessMove>) tempPiece.pieceMoves(gameBoard,tempPosition);
+                    opposingMoves.addAll(tempPiece.pieceMoves(gameBoard,tempPosition));
                 }
             }
         }
@@ -135,15 +158,18 @@ public class ChessGame {
         if (!isInCheck(teamColor)){
             return false;
         }
-
         ChessPosition kingPosition = kingFinder(teamColor);
-        PieceMoveCalculator kingMoveList = new PieceMoveCalculator();
-        kingMoveList.calculateMoves(kingPosition,gameBoard, gameBoard.getPiece(kingPosition));
-        //Check all the moves in kingMoveList, they are not all in opposing team valid moves,
-        //then return true or false based on the result
-
-
-        return true;
+        PieceMoveCalculator tempObject = new PieceMoveCalculator();
+        //ArrayList<ChessMove> kingMoveList = (ArrayList<ChessMove>) tempObject.calculateMoves(kingPosition,gameBoard,gameBoard.getPiece(kingPosition));
+        //Check all moves to see if it will block things, not just the kings moves.
+        //Check all pieces of the same color,
+        Collection<ChessMove> teamMoves = sameTeamPieces(teamColor);
+        for (ChessMove move: teamMoves){
+            if (move != null){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -155,7 +181,7 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         throw new RuntimeException("Not implemented");
-        //Whill check the valid move list. If the list is empty, then it this should return true, and end the game.
+        //Will check the valid move list. If the list is empty, then it this should return true, and end the game.
     }
 
     /**
@@ -194,14 +220,29 @@ public class ChessGame {
                 ChessPosition tempPosition = new ChessPosition(i,j);
                 //If the position is null, then skip, so that we don't crash the system
                 if (gameBoard.getPiece(tempPosition) == null){continue;}
-                //Checking if it's a king piece and the proper color
-                else if (gameBoard.getPiece(tempPosition).getTeamColor() != teamColor) {
+                if (gameBoard.getPiece(tempPosition).getTeamColor() != teamColor) {
                     ChessPiece tempPiece = gameBoard.getPiece(tempPosition);
-                    opposingMoves = (ArrayList<ChessMove>) tempPiece.pieceMoves(gameBoard,tempPosition);
+                    opposingMoves.addAll(tempPiece.pieceMoves(gameBoard,tempPosition));
                 }
             }
         }
         return opposingMoves;
+    }
+
+    public Collection<ChessMove> sameTeamPieces(TeamColor teamColor){
+        ArrayList<ChessMove> teamMoves = new ArrayList<>();
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j < 9; j++){
+                ChessPosition tempPosition = new ChessPosition(i,j);
+                //If the position is null, then skip, so that we don't crash the system
+                if (gameBoard.getPiece(tempPosition) == null){continue;}
+                if (gameBoard.getPiece(tempPosition).getTeamColor() == teamColor) {
+                    ChessPiece tempPiece = gameBoard.getPiece(tempPosition);
+                    teamMoves.addAll(tempPiece.pieceMoves(gameBoard,tempPosition));
+                }
+            }
+        }
+        return teamMoves;
     }
 
     /**
