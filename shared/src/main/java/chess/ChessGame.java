@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -56,7 +57,7 @@ public class ChessGame {
         if (tempPiece == null){
             return null;
         }
-        //We're getting all of the moves that the piece can make, regardless of check / checkmate.
+        //We're getting all the moves that the piece can make, regardless of check / checkmate.
         Collection<ChessMove> potentialMoves = tempPiece.pieceMoves(gameBoard, startPosition);
         ArrayList<ChessMove> legalMoves = new ArrayList<>();
 
@@ -154,22 +155,30 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        //if not in check, then it can't be in checkmate
+        //If not in check, then it can't be in checkmate
         if (!isInCheck(teamColor)){
             return false;
         }
-        ChessPosition kingPosition = kingFinder(teamColor);
-        PieceMoveCalculator tempObject = new PieceMoveCalculator();
-        //ArrayList<ChessMove> kingMoveList = (ArrayList<ChessMove>) tempObject.calculateMoves(kingPosition,gameBoard,gameBoard.getPiece(kingPosition));
-        //Check all moves to see if it will block things, not just the kings moves.
-        //Check all pieces of the same color,
-        Collection<ChessMove> teamMoves = sameTeamPieces(teamColor);
-        for (ChessMove move: teamMoves){
-            if (move != null){
-                return true;
+
+        // Looping through the entire board
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j < 9; j++){
+                ChessPosition tempPosition = new ChessPosition(i, j);
+                ChessPiece tempPiece = gameBoard.getPiece(tempPosition);
+
+                //An empty square, so we move on.
+                if (tempPiece == null) continue;
+                //Skipping our opponents pieces.
+                if (tempPiece.getTeamColor() != teamColor) continue;
+                //Now it's one of our pieces, so we run it through valid move function, if we get anything, then not checkmate.
+                Collection<ChessMove> moves = validMoves(tempPosition);
+                if (moves != null && !moves.isEmpty()) {
+                    return false;
+                }
             }
         }
-        return false;
+        //no valid moves were found, so it's all over.
+        return true;
     }
 
     /**
@@ -180,8 +189,24 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
-        //Will check the valid move list. If the list is empty, then it this should return true, and end the game.
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j < 9; j++){
+                ChessPosition tempPosition = new ChessPosition(i, j);
+                ChessPiece tempPiece = gameBoard.getPiece(tempPosition);
+
+                //An empty square, so we move on.
+                if (tempPiece == null) continue;
+                //Skipping our opponents pieces.
+                if (tempPiece.getTeamColor() != teamColor) continue;
+                //Now it's one of our pieces, so we run it through valid move function, if we get anything, then not checkmate.
+                Collection<ChessMove> moves = validMoves(tempPosition);
+                if (moves != null && !moves.isEmpty()) {
+                    return false;
+                }
+            }
+        }
+        //no valid moves were found, so it's all over.
+        return true;
     }
 
     /**
@@ -269,5 +294,25 @@ public class ChessGame {
         return gameBoard;
     }
 
+    @Override
+    public String toString() {
+        return "ChessGame{" +
+                "gameBoard=" + gameBoard +
+                ", teamTurn=" + teamTurn +
+                '}';
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessGame chessGame = (ChessGame) o;
+        return Objects.equals(gameBoard, chessGame.gameBoard) && teamTurn == chessGame.teamTurn;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(gameBoard, teamTurn);
+    }
 }
