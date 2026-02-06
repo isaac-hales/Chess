@@ -103,7 +103,14 @@ public class ChessGame {
         for (ChessMove legalMove: potentialMoves){
             if (legalMove.equals(move)){
                 gameBoard.addPiece(move.getStartPosition(),null);
-                gameBoard.addPiece(move.getEndPosition(),tempPiece);
+                //Checking if it's a pawn, and then doing promotion if so.
+                if (move.getPromotionPiece() != null){
+                    ChessPiece promotedPiece = new ChessPiece(tempPiece.getTeamColor(), move.getPromotionPiece());
+                    gameBoard.addPiece(move.getEndPosition(), promotedPiece);
+                }
+                //Not a pawn, so just add it like a normal piece.
+                else{gameBoard.addPiece(move.getEndPosition(),tempPiece);}
+
                 if (tempPiece.pieceColor == TeamColor.WHITE){setTeamTurn(TeamColor.BLACK);}
                 else{setTeamTurn(TeamColor.WHITE);}
                 return;
@@ -189,6 +196,11 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
+
+        if (isInCheck(teamColor)){
+            return false;
+        }
+
         for (int i = 1; i < 9; i++){
             for (int j = 1; j < 9; j++){
                 ChessPosition tempPosition = new ChessPosition(i, j);
