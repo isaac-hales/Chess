@@ -70,16 +70,19 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        ChessPiece tempPiece = gameBoard.getPiece(move.getEndPosition());
+        ChessPiece tempPiece = gameBoard.getPiece(move.getStartPosition());
+        if (tempPiece == null){return;}
         final ArrayList<ChessMove> potentialMoves = (ArrayList<ChessMove>) validMoves(move.getStartPosition());
         if (tempPiece.getTeamColor() != getTeamTurn()){
             throw new InvalidMoveException("It is not currently " + tempPiece.getTeamColor()+"s turn yet.");
         }
         for (ChessMove legalMove: potentialMoves){
-            if (legalMove == move){
+            if (legalMove.equals(move)){
                 gameBoard.addPiece(move.getStartPosition(),null);
                 gameBoard.addPiece(move.getEndPosition(),tempPiece);
-                break;
+                if (tempPiece.pieceColor == TeamColor.WHITE){setTeamTurn(TeamColor.BLACK);}
+                else{setTeamTurn(TeamColor.WHITE);}
+                return;
             }
         }
         throw new InvalidMoveException("Your move " + move + " is not a legal move.");
@@ -91,10 +94,34 @@ public class ChessGame {
      * @param teamColor which team to check for check
      * @return True if the specified team is in check
      */
+    //Rewrite using the updated functions
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
-        //Get the moveList of all pieces of opposing color, and then see if any of the moves include the teamColor king piece
-        //So run validMoves, and then check if any of the pieces is
+        //Find the king for the color listed, check all the valid moves for the opposite team
+        //If one of them equals the king position, then the piece is in check.
+        ChessPosition kingPosition = null;
+        ArrayList<ChessMove> opposingMoves = new ArrayList<>();
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j < 9; j++){
+                ChessPosition tempPosition = new ChessPosition(i,j);
+                //If the position is null, then skip, so that we don't crash the system
+                if (gameBoard.getPiece(tempPosition) == null){continue;}
+                //Checking if it's a king piece and the proper color
+                if (gameBoard.getPiece(tempPosition).getPieceType() == ChessPiece.PieceType.KING &&
+                        gameBoard.getPiece(tempPosition).getTeamColor() == teamColor) {
+                    kingPosition = tempPosition;
+                }
+                else if (gameBoard.getPiece(tempPosition).getTeamColor() != teamColor) {
+                    ChessPiece tempPiece = gameBoard.getPiece(tempPosition);
+                    opposingMoves = (ArrayList<ChessMove>) tempPiece.pieceMoves(gameBoard,tempPosition);
+                }
+            }
+        }
+        for (ChessMove legalMove: opposingMoves){
+            if (legalMove.getEndPosition().equals(kingPosition)){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -104,7 +131,19 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        //if not in check, then it can't be in checkmate
+        if (!isInCheck(teamColor)){
+            return false;
+        }
+
+        ChessPosition kingPosition = kingFinder(teamColor);
+        PieceMoveCalculator kingMoveList = new PieceMoveCalculator();
+        kingMoveList.calculateMoves(kingPosition,gameBoard, gameBoard.getPiece(kingPosition));
+        //Check all the moves in kingMoveList, they are not all in opposing team valid moves,
+        //then return true or false based on the result
+
+
+        return true;
     }
 
     /**
@@ -117,6 +156,52 @@ public class ChessGame {
     public boolean isInStalemate(TeamColor teamColor) {
         throw new RuntimeException("Not implemented");
         //Whill check the valid move list. If the list is empty, then it this should return true, and end the game.
+    }
+
+    /**
+     * Gets the king position for isInCheck, isInCheckmate, and isInStalemate.
+     * @param teamColor
+     * @return the position of the king
+     */
+    public ChessPosition kingFinder(TeamColor teamColor){
+        ChessPosition kingPosition = null;
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j < 9; j++){
+                ChessPosition tempPosition = new ChessPosition(i,j);
+                //If the position is null, then skip, so that we don't crash the system
+                if (gameBoard.getPiece(tempPosition) == null){continue;}
+                //Checking if it's a king piece and the proper color
+                if (gameBoard.getPiece(tempPosition).getPieceType() == ChessPiece.PieceType.KING &&
+                        gameBoard.getPiece(tempPosition).getTeamColor() == teamColor) {
+                    kingPosition = tempPosition;
+                    break;
+                }
+            }
+        }
+        return kingPosition;
+    }
+
+    /**
+     * Gets the moves of the opposing team for isInCheckmate and isInStalemate.
+     * @param teamColor
+     *
+     * @return opposingMoves
+     */
+    public Collection<ChessMove> opposingTeamMoves(TeamColor teamColor){
+        ArrayList<ChessMove> opposingMoves = new ArrayList<>();
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j < 9; j++){
+                ChessPosition tempPosition = new ChessPosition(i,j);
+                //If the position is null, then skip, so that we don't crash the system
+                if (gameBoard.getPiece(tempPosition) == null){continue;}
+                //Checking if it's a king piece and the proper color
+                else if (gameBoard.getPiece(tempPosition).getTeamColor() != teamColor) {
+                    ChessPiece tempPiece = gameBoard.getPiece(tempPosition);
+                    opposingMoves = (ArrayList<ChessMove>) tempPiece.pieceMoves(gameBoard,tempPosition);
+                }
+            }
+        }
+        return opposingMoves;
     }
 
     /**
