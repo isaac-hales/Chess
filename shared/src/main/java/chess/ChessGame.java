@@ -16,7 +16,7 @@ public class ChessGame {
 
     //This is a constructor, so any function that we need to run at the start, we run here.
     public ChessGame() {
-        gameBoard.resetBoard(); //Is this a mistake, in case we want to set up other boards?
+        gameBoard.resetBoard(); //Not a mistake. It should set up the default position, by default.
         teamTurn = TeamColor.WHITE; //First turn belongs to white team.
     }
 
@@ -57,14 +57,9 @@ public class ChessGame {
         if (tempPiece == null){
             return null;
         }
-
         final ArrayList<ChessMove> potentialMoves = (ArrayList<ChessMove>) tempPiece.pieceMoves(gameBoard,startPosition);
-        for (ChessMove move : potentialMoves){
-            //Checking if the piece is in check / checkmate
-            if (isInCheck(tempPiece.pieceColor) || isInCheckmate(tempPiece.pieceColor)){
-                potentialMoves.remove(move);
-            }
-        }
+        //Checking if the piece is in check / checkmate, and if so, it will be removed.
+        potentialMoves.removeIf(move -> isInCheck(tempPiece.pieceColor) || isInCheckmate(tempPiece.pieceColor));
         return potentialMoves;
     }
 
@@ -75,10 +70,20 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
-        // The computer will just input a move in the parameter.
-        //Run isInCheck and isInCheckmate on own color to check for legality
+        ChessPiece tempPiece = gameBoard.getPiece(move.getEndPosition());
+        final ArrayList<ChessMove> potentialMoves = (ArrayList<ChessMove>) validMoves(move.getStartPosition());
+        if (tempPiece.getTeamColor() != getTeamTurn()){
+            throw new InvalidMoveException("It is not currently " + tempPiece.getTeamColor()+"s turn yet.");
         }
+        for (ChessMove legalMove: potentialMoves){
+            if (legalMove == move){
+                gameBoard.addPiece(move.getStartPosition(),null);
+                gameBoard.addPiece(move.getEndPosition(),tempPiece);
+                break;
+            }
+        }
+        throw new InvalidMoveException("Your move " + move + " is not a legal move.");
+    }
 
     /**
      * Determines if the given team is in check
@@ -88,7 +93,7 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         throw new RuntimeException("Not implemented");
-        //Get the movelist of all pieces of opposing color, and then see if any of the moves include the teamColor king piece
+        //Get the moveList of all pieces of opposing color, and then see if any of the moves include the teamColor king piece
         //So run validMoves, and then check if any of the pieces is
     }
 
@@ -111,8 +116,7 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         throw new RuntimeException("Not implemented");
-        //Similar code to Checkmate function, only difference is that this code returns true if the king is NOT in danger, but
-        //surrounding squares are.
+        //Whill check the valid move list. If the list is empty, then it this should return true, and end the game.
     }
 
     /**
@@ -128,8 +132,6 @@ public class ChessGame {
                 gameBoard.addPiece(tempPosition,tempPiece);
             }
         }
-        throw new RuntimeException("Not implemented");
-
     }
 
     /**
