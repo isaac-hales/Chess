@@ -28,6 +28,7 @@ public class StandardAPITests {
     @BeforeAll
     public static void init() {
         server = new Server();
+        //The 0 is basically telling the computer to find a port and use it.
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
 

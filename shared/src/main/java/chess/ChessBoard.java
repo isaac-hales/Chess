@@ -86,15 +86,7 @@ public class ChessBoard {
         addPiece(new ChessPosition(7, 8), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
 
     }
-
-    @Override
-    //Research on Arrays.copyOf (shallow or deep copy, how deep is the copy)
-    protected Object clone() throws CloneNotSupportedException{
-        var clone = new ChessBoard();
-        clone.squares =Arrays.copyOf(squares,squares.length);
-        return clone;
-    }
-
+    
     //Generate String Override
     @Override
     public String toString() {
