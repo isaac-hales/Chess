@@ -1,6 +1,7 @@
 package server;
 
 import chess.AuthData;
+import chess.ChessGame;
 import chess.UserData;
 import io.javalin.*;
 
@@ -13,6 +14,7 @@ public class Server {
     //Storage for the users logging in, and the authTokens
     private final Map<String, UserData> users = new HashMap<>();
     private final Map<String, AuthData> authTokens = new HashMap<>();
+    private final Map<String, ChessGame> allChessGames = new HashMap<>();
 
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
@@ -22,8 +24,13 @@ public class Server {
         /**
          * Clears the database. Removes all users, games, and authTokens
          */
-        javalin.delete("/user",ctx -> {
-
+        javalin.delete("/db",ctx -> {
+            //Clearing out all items / storages
+            removeAllItems(users);
+            removeAllItems(authTokens);
+            removeAllItems(allChessGames);
+            ctx.status(200);
+            ctx.result("{}");
         });
 
 
@@ -31,27 +38,38 @@ public class Server {
         /**
          * Register a new user.
          */
-        //URL Path /db, HTTP Method: DELETE, Success: [200] {}, Failure: [500] {"message": "Error: (description of error)" }
-
-        //Double Check that User is the correct name / approach
         javalin.post("/user", ctx -> {
             UserData user = ctx.bodyAsClass(UserData.class);
             String username = user.userName();
+            String password = user.userPassword();
+            String email = user.userEmail();
 
-            //If the username was NOT found in the users Map
-            if (findUserName(username) == null) {
-                //Return 200,
-                ctx.status(200);
-                AuthData authUser = AuthData.create(username);
-                //
-                ctx.json(authUser);
-                users.put(user.userName(), user);
-                authTokens.put(authUser.authToken(), authUser);
+            //Check if there is a cleaner way to see if
+            try {
+                if (isInvalid(username) || isInvalid(password) || isInvalid(email)) {
+                    ctx.status(400);
+                    ctx.result("{ \"message\": \"Error: bad request\" }");
+                }
+                //If the username was NOT found in the users Map
+                else if (findUserName(username) != null) {
+                    ctx.status(403); //Client Error, cause the client tried an already taken username.
+                    ctx.result("message : Error: Name already taken");
+                }
+                //If the username WAS found in the users Map
+                else {
+                    //Return 200,
+                    ctx.status(200);
+                    AuthData authUser = AuthData.create(username);
+                    //Returning the username and the authToken
+                    ctx.json(authUser);
+                    users.put(user.userName(), user);
+                    authTokens.put(authUser.authToken(), authUser);
+                }
             }
-            //If the username WAS found in the users Map
-            else {
-                ctx.status(403); //Client Error, cause the client tried an already taken username.
-                ctx.result("message : Error: (description of error)");
+            //If there was any other sort of issue with connecting to the server
+            catch (Exception e) {
+                ctx.status(500);
+                ctx.result("{ \"message\": \"Error: " + e.getMessage() + "\" }");
             }
 
         });
@@ -93,12 +111,18 @@ public class Server {
         return javalin.port();
     }
 
-    //Can we use this for finding an authTokens too? I think so.
     private String findUserName(String theUserName) {
         if (users.containsKey(theUserName)) { return theUserName; }
         return null;
     }
 
+    //This will return a true if the item is null or blank spaces, which should cause an error. Else it will return false
+    private boolean isInvalid(String item){
+        return item == null || item.isBlank();
+    }
+
+
+    //Maybe think about removing this. It can be implemented into the code pretty easy.
     private void removeAllItems(Map givenMap){
         givenMap.clear();
     }
