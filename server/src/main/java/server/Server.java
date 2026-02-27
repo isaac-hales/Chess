@@ -44,7 +44,6 @@ public class Server {
             String password = user.userPassword();
             String email = user.userEmail();
 
-            //Check if there is a cleaner way to see if
             try {
                 if (isInvalid(username) || isInvalid(password) || isInvalid(email)) {
                     ctx.status(400);
@@ -53,7 +52,7 @@ public class Server {
                 //If the username was NOT found in the users Map
                 else if (findUserName(username) != null) {
                     ctx.status(403); //Client Error, cause the client tried an already taken username.
-                    ctx.result("message : Error: Name already taken");
+                    ctx.result("{ \"message\": \"Error: unauthorized\" }");
                 }
                 //If the username WAS found in the users Map
                 else {
@@ -79,12 +78,51 @@ public class Server {
         /**
          * Logs in an existing user (returns a new authToken)
          */
+        javalin.post("/session", ctx -> {
+            UserData user = ctx.bodyAsClass(UserData.class);
+            String username = user.userName();
+            String password = user.userPassword();
+
+            try {
+                if (isInvalid(username) || isInvalid(password)) {
+                    ctx.status(400);
+                    ctx.result("{ \"message\": \"Error: unauthorized\" }");
+                }
+                //Checking if the username is correct
+                else if (findUserName(username) == null) {
+                    ctx.status(401); //Client Error, cause the client tried an already taken username.
+                    ctx.result("{ \"message\": \"Error: unauthorized\" }");
+                }
+                //Checking if the password is wrong.
+                else if (!password.equals(users.get(username).userPassword())) {
+                    ctx.status(401); //Client Error, cause the client tried an incorrect password
+                    ctx.result("{ \"message\": \"Error: unauthorized\" }");
+                }
+                //If the username WAS found in the users Map
+                else {
+                    //Return 200,
+                    ctx.status(200);
+                    AuthData authUser = AuthData.create(username);
+                    //Returning the username and the authToken
+                    ctx.json(authUser);
+                    authTokens.put(authUser.authToken(), authUser);
+                }
+            }
+            //If there was any other sort of issue with connecting to the server
+            catch (Exception e) {
+                ctx.status(500);
+                ctx.result("{ \"message\": \"Error: " + e.getMessage() + "\" }");
+            }
+        });
 
 
         //Logout
         /**
          * Logs out the user represented by the authToken
          */
+        javalin.post("/session", ctx -> {
+            
+        });
 
 
         //List Games
@@ -122,7 +160,7 @@ public class Server {
     }
 
 
-    //Maybe think about removing this. It can be implemented into the code pretty easy.
+    //Maybe think about removing this. It can be implemented into the code pretty easily.
     private void removeAllItems(Map givenMap){
         givenMap.clear();
     }
