@@ -2,8 +2,11 @@ package server;
 
 import chess.AuthData;
 import chess.ChessGame;
+import chess.GameData;
 import chess.UserData;
 import io.javalin.*;
+import java.util.Random;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,8 +17,9 @@ public class Server {
     //Storage for the users logging in, and the authTokens
     private final Map<String, UserData> users = new HashMap<>(); //Key is userName,
     private final Map<String, AuthData> authTokens = new HashMap<>(); //Key is userName
-    private final Map<String, ChessGame> allChessGames = new HashMap<>(); //Key is GameID
+    private final Map<Integer, GameData> allChessGames = new HashMap<>(); //authToken?
 
+    //Think about making an authorization helper function
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
         // Register your endpoints and exception handlers here.
@@ -72,7 +76,6 @@ public class Server {
             String username = user.userName();
             String password = user.userPassword();
 
-
             try {
                 if (isInvalid(username) || isInvalid(password)) {
                     ctx.status(400);
@@ -107,7 +110,6 @@ public class Server {
 
 
         //Logout
-        //How do I do this then without duplication?
         javalin.delete("/session", ctx -> {
             String authToken = ctx.header("authorization");
             try {
@@ -130,15 +132,54 @@ public class Server {
 
 
         //List Games
-        /**
-         * Gives a list of all games.
-         */
+        javalin.get("/game", ctx -> {
+            String authToken = ctx.header("authorization");
+
+            try {
+                //private final Map<String, AuthData> authTokens = new HashMap<>();
+                if (authTokens.containsKey(authToken)) {
+                    ctx.status(200);
+                    //I'm not sure how, but I need to access all of this from the GameMap, I think, but we'll worry about it later.
+                    ctx.json(Map.of("games",allChessGames.values()));
+                    //ctx.result("{ \"games\": [{\"gameID\": 1234, \"whiteUsername\":\"\", \"blackUsername\":\"\", \"gameName:\"\"} ]}");
+                }
+                //I'm unsure of how to write a [400] bad request
+                else {
+                    ctx.status(401);
+                    ctx.result("{ \"message\": \"Error: unauthorized\" }");
+                }
+            }
+            catch (Exception e) {
+                ctx.status(500);
+                ctx.result("{ \"message\": \"Error: (description of error)\" }");
+            }
+        });
 
 
         //Create Game
-        /**
-         * Creates a new game
-         */
+        javalin.post("/game", ctx -> {
+            try {
+                //private final Map<String, AuthData> authTokens = new HashMap<>();
+                String authToken = ctx.header("authorization");
+                if (authTokens.containsKey(authToken)) {
+                    ctx.status(200);
+                    var body = ctx.bodyAsClass(Map.class);
+                    String gameName = (String) body.get("gameName");
+                    int gameID = allChessGames.size() + 1;
+                    GameData newGame = new GameData(gameID, null, null, gameName, new ChessGame());
+                    allChessGames.put(gameID, newGame);
+                    ctx.json(Map.of("gameID", gameID));
+                }
+                else {
+                    ctx.status(401);
+                    ctx.result("{ \"message\": \"Error: unauthorized\" }");
+                }
+            }
+            catch (Exception e) {
+                ctx.status(500);
+                ctx.result("{ \"message\": \"Error: (description of error)\" }");
+            }
+        });
 
 
         //Join Game
@@ -165,8 +206,13 @@ public class Server {
 
 
     //Maybe think about removing this. It can be implemented into the code pretty easily.
-    private void removeAllItems(Map givenMap){
+    private void removeAllItems(Map givenMap) {
         givenMap.clear();
+    }
+
+    //A helper function for checking authorization. It checks that the authToken isn't null, and that it's listed in the database.
+    private boolean isAuthorized(String authToken){
+        return authToken != null && authTokens.containsKey(authToken);
     }
 
     public void stop() {

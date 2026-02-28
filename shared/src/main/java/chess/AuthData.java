@@ -7,5 +7,4 @@ public record AuthData(String userName, String authToken) {
     public static AuthData create(String userName) {
         return new AuthData(userName, UUID.randomUUID().toString());
     }
-    //Class starts this Thursday, at 7 Talmage 1110
 }
