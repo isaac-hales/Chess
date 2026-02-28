@@ -12,18 +12,15 @@ public class Server {
 
     private final Javalin javalin;
     //Storage for the users logging in, and the authTokens
-    private final Map<String, UserData> users = new HashMap<>();
-    private final Map<String, AuthData> authTokens = new HashMap<>();
-    private final Map<String, ChessGame> allChessGames = new HashMap<>();
+    private final Map<String, UserData> users = new HashMap<>(); //Key is userName,
+    private final Map<String, AuthData> authTokens = new HashMap<>(); //Key is userName
+    private final Map<String, ChessGame> allChessGames = new HashMap<>(); //Key is GameID
 
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
         // Register your endpoints and exception handlers here.
 
         //CLEAR APPLICATION
-        /**
-         * Clears the database. Removes all users, games, and authTokens
-         */
         javalin.delete("/db",ctx -> {
             //Clearing out all items / storages
             removeAllItems(users);
@@ -33,11 +30,7 @@ public class Server {
             ctx.result("{}");
         });
 
-
         //Register
-        /**
-         * Register a new user.
-         */
         javalin.post("/user", ctx -> {
             UserData user = ctx.bodyAsClass(UserData.class);
             String username = user.userName();
@@ -52,7 +45,7 @@ public class Server {
                 //If the username was NOT found in the users Map
                 else if (findUserName(username) != null) {
                     ctx.status(403); //Client Error, cause the client tried an already taken username.
-                    ctx.result("{ \"message\": \"Error: unauthorized\" }");
+                    ctx.result("{ \"message\": \"Error: already taken\" }");
                 }
                 //If the username WAS found in the users Map
                 else {
@@ -73,15 +66,12 @@ public class Server {
 
         });
 
-
         //Login
-        /**
-         * Logs in an existing user (returns a new authToken)
-         */
         javalin.post("/session", ctx -> {
             UserData user = ctx.bodyAsClass(UserData.class);
             String username = user.userName();
             String password = user.userPassword();
+
 
             try {
                 if (isInvalid(username) || isInvalid(password)) {
@@ -117,11 +107,25 @@ public class Server {
 
 
         //Logout
-        /**
-         * Logs out the user represented by the authToken
-         */
-        javalin.post("/session", ctx -> {
-            
+        //How do I do this then without duplication?
+        javalin.delete("/session", ctx -> {
+            String authToken = ctx.header("authorization");
+            try {
+                //private final Map<String, AuthData> authTokens = new HashMap<>();
+                if (authTokens.containsKey(authToken)) {
+                    authTokens.remove(authToken);
+                    ctx.status(200);
+                    ctx.result("{}");
+                }
+                else {
+                    ctx.status(401);
+                    ctx.result("{ \"message\": \"Error: unauthorized\" }");
+                }
+            }
+            catch (Exception e) {
+                ctx.status(500);
+                ctx.result("{ \"message\": \"Error: " + e.getMessage() + "\" }");
+            }
         });
 
 
