@@ -143,7 +143,6 @@ public class Server {
                     ctx.json(Map.of("games",allChessGames.values()));
                     //ctx.result("{ \"games\": [{\"gameID\": 1234, \"whiteUsername\":\"\", \"blackUsername\":\"\", \"gameName:\"\"} ]}");
                 }
-                //I'm unsure of how to write a [400] bad request
                 else {
                     ctx.status(401);
                     ctx.result("{ \"message\": \"Error: unauthorized\" }");
@@ -183,10 +182,51 @@ public class Server {
 
 
         //Join Game
-        /**
-         * Verifies that the specified game exists and adds the
-         * caller as the requested color to the game.
-         */
+        javalin.put("/game",ctx -> {
+            try {
+                String authToken = ctx.header("authorization");
+                var body = ctx.bodyAsClass(Map.class);
+                //get the gameID & team color
+                int currentGameID = (Integer) body.get("gameID");
+                String playerColor = (String) body.get("playerColor");
+                GameData updatedGame;
+                if (!isAuthorized(authToken)) {
+                    ctx.status(401);
+                    ctx.result("{ \"message\": \"Error: unauthorized\" }");
+                }
+                else if (!allChessGames.containsKey(currentGameID)) {
+                    ctx.status(400);
+                    ctx.result("{ \"message\": \"Error: bad request\" }");
+                }
+                else {
+                    //need to get gameID and use that to find the game, and then add the playerColor, then update the game
+                    String username = authTokens.get(authToken).userName();
+                    GameData currentGame = allChessGames.get(currentGameID);
+                    //If the player joining is white
+                    if (playerColor.equalsIgnoreCase("WHITE") && currentGame.whiteUsername() == null){
+                        updatedGame = new GameData(currentGameID, username, currentGame.blackUsername(), currentGame.gameName(), currentGame.game());
+                    }
+                    //if the player joining is black
+                    else if (playerColor.equalsIgnoreCase("BLACK") && currentGame.blackUsername() == null){
+                        updatedGame = new GameData(currentGameID, currentGame.whiteUsername(), username, currentGame.gameName(), currentGame.game());
+                    }
+                    else {
+                        ctx.status(403);
+                        ctx.result("{ \"message\": \"Error: already taken\" }");
+                        return;
+                    }
+                    allChessGames.put(currentGameID, updatedGame);
+                    ctx.status(200);
+                    ctx.result("{}");
+
+                }
+
+            }
+            catch (Exception e){
+                ctx.status(500);
+                ctx.result("{ \"message\": \"Error: (description of error)\" }");
+            }
+        });
     }
 
     public int run(int desiredPort) {
