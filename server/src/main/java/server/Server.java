@@ -17,9 +17,8 @@ public class Server {
     //Storage for the users logging in, and the authTokens
     private final Map<String, UserData> users = new HashMap<>(); //Key is userName,
     private final Map<String, AuthData> authTokens = new HashMap<>(); //Key is userName
-    private final Map<Integer, GameData> allChessGames = new HashMap<>(); //authToken?
+    private final Map<Integer, GameData> allChessGames = new HashMap<>(); //authToken
 
-    //Think about making an authorization helper function
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
         // Register your endpoints and exception handlers here.
@@ -108,7 +107,6 @@ public class Server {
             }
         });
 
-
         //Logout
         javalin.delete("/session", ctx -> {
             String authToken = ctx.header("authorization");
@@ -129,7 +127,6 @@ public class Server {
                 ctx.result("{ \"message\": \"Error: " + e.getMessage() + "\" }");
             }
         });
-
 
         //List Games
         javalin.get("/game", ctx -> {
@@ -153,7 +150,6 @@ public class Server {
                 ctx.result("{ \"message\": \"Error: (description of error)\" }");
             }
         });
-
 
         //Create Game
         javalin.post("/game", ctx -> {
@@ -179,7 +175,6 @@ public class Server {
                 ctx.result("{ \"message\": \"Error: (description of error)\" }");
             }
         });
-
 
         //Join Game
         javalin.put("/game",ctx -> {
