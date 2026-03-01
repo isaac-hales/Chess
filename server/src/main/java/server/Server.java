@@ -4,20 +4,19 @@ import chess.AuthData;
 import chess.ChessGame;
 import chess.GameData;
 import chess.UserData;
+import dataaccess.AuthDAO;
+import dataaccess.GameDAO;
+import dataaccess.UserDAO;
 import io.javalin.*;
-import java.util.Random;
-
-
-import java.util.HashMap;
 import java.util.Map;
 
 public class Server {
 
     private final Javalin javalin;
     //Storage for the users logging in, and the authTokens
-    private final Map<String, UserData> users = new HashMap<>(); //Key is userName,
-    private final Map<String, AuthData> authTokens = new HashMap<>(); //Key is userName
-    private final Map<Integer, GameData> allChessGames = new HashMap<>(); //authToken
+    private final UserDAO userDAO = new UserDAO();
+    private final GameDAO gameDAO = new GameDAO();
+    private final AuthDAO authDAO = new AuthDAO();
 
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
