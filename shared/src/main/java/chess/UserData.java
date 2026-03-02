@@ -7,6 +7,9 @@ package chess;
  * Accessor methods userName(), userPassword(), userEmail()
  * equals(), hashCode(), and toString()
  */
-public record UserData(String username, String password, String email) {
-
-}
+public record UserData(
+        String username,
+        String password,
+        String email
+)
+{}

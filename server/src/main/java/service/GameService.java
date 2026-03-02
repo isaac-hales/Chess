@@ -50,7 +50,7 @@ public class GameService {
             }
             GameData updatedGame;
             GameData currentGame = gameDAO.getGame(gameID);
-            String username = authenticUser.userName();
+            String username = authenticUser.username();
             if (currentGame == null) {
                 throw new ServiceException(400, "Error: bad request");
             }

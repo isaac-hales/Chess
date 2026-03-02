@@ -11,7 +11,6 @@ import service.ClearService;
 import service.GameService;
 import service.UserService;
 import service.ServiceException;
-
 import java.util.Collection;
 import java.util.Map;
 
@@ -31,9 +30,6 @@ public class Server {
     public Server() {
         javalin = Javalin.create(config -> {
             config.staticFiles.add("web");
-            config.jsonMapper(new io.javalin.json.JavalinJackson().updateMapper(mapper -> {
-                mapper.configure(com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-            }));
         });
 
         javalin.exception(ServiceException.class, (e, ctx) -> {
@@ -71,7 +67,7 @@ public class Server {
                 ctx.result("{ \"message\": \"Error: unauthorized\" }");
                 return;
             }
-
+            System.out.println("Returning username: " + user.username());
             AuthData result = userService.login(user);
             ctx.status(200);
             ctx.json(result);
@@ -112,14 +108,14 @@ public class Server {
         javalin.put("/game", ctx -> {
             String authToken = ctx.header("authorization");
             var body = ctx.bodyAsClass(Map.class);
-            Object tempGameID = body.get("gameID");
+            Object gameID = body.get("gameID");
             String playerColor = (String) body.get("playerColor");
-            if (tempGameID == null) {
+            if (gameID == null) {
                 ctx.status(400);
                 ctx.json(Map.of("message", "Error: bad request"));
                 return;
             }
-            int currentGameID = (Integer) tempGameID;
+            int currentGameID = (Integer) gameID;
             gameService.joinGame(authToken, currentGameID, playerColor);
             ctx.status(200);
             ctx.result("{}");

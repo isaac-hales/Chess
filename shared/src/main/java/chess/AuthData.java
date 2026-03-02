@@ -1,8 +1,11 @@
 package chess;
 
-public record AuthData(String userName, String authToken
-) {
+public record AuthData(
+        String authToken,
+        String username
+)
+{
     public static AuthData create(String userName) {
-        return new AuthData(userName, java.util.UUID.randomUUID().toString());
+        return new AuthData(java.util.UUID.randomUUID().toString(), userName);
     }
 }

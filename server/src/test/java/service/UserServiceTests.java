@@ -40,7 +40,7 @@ public class UserServiceTests {
         AuthData result = userService.register(user);
         //Checking that the result works with assert
         assertNotNull(result);
-        assertEquals("testUser", result.userName());
+        assertEquals("testUser", result.username());
     }
 
     @Test
