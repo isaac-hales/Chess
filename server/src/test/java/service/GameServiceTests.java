@@ -13,7 +13,7 @@ import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class GameServiceTest {
+public class GameServiceTests {
     // These will run before/after each test, so that we have a clean slate
     private UserDAO userDAO;
     private AuthDAO authDAO;

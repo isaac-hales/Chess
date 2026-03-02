@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ClearServiceTest {
+public class ClearServiceTests {
     private UserDAO userDAO;
     private AuthDAO authDAO;
     private GameDAO gameDAO = new GameDAO();

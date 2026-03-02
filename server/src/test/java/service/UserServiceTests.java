@@ -10,7 +10,7 @@ import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UserServiceTest {
+public class UserServiceTests {
 
     // These will run before/after each test, so that we have a clean slate
     private UserDAO userDAO;
