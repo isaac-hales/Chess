@@ -1,10 +1,12 @@
 package chess;
-import java.util.UUID;
 
-public record AuthData(String userName, String authToken) {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    //Generates the authToken,
+public record AuthData(
+        @JsonProperty("username") String userName,
+        @JsonProperty("authToken") String authToken
+) {
     public static AuthData create(String userName) {
-        return new AuthData(userName, UUID.randomUUID().toString());
+        return new AuthData(userName, java.util.UUID.randomUUID().toString());
     }
 }

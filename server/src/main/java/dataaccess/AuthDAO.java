@@ -17,7 +17,6 @@ public class AuthDAO {
         return authTokens.get(authToken);
     }
 
-    //This is basically logging out
     public void deleteAuth(String authToken) throws DataAccessException{
         if (!authTokens.containsKey(authToken)){
             throw new DataAccessException("Auth token does not exist");
