@@ -13,6 +13,10 @@ import service.UserService;
 import service.ServiceException;
 import java.util.Collection;
 import java.util.Map;
+import com.google.gson.Gson;
+import io.javalin.json.JsonMapper;
+import org.jetbrains.annotations.NotNull;
+import java.lang.reflect.Type;
 
 public class Server {
 
@@ -28,10 +32,25 @@ public class Server {
     private final ClearService clearService = new ClearService(userDAO, gameDAO, authDAO);
 
     public Server() {
+        Gson gson = new Gson();
+        JsonMapper gsonMapper = new JsonMapper() {
+            @NotNull
+            @Override
+            public String toJsonString(@NotNull Object obj, @NotNull Type type) {
+                return gson.toJson(obj, type);
+            }
+
+            @NotNull
+            @Override
+            public <T> T fromJsonString(@NotNull String json, @NotNull Type targetType) {
+                return gson.fromJson(json, targetType);
+            }
+        };
+
         javalin = Javalin.create(config -> {
             config.staticFiles.add("web");
+            config.jsonMapper(gsonMapper);
         });
-
         javalin.exception(ServiceException.class, (e, ctx) -> {
             ctx.status(e.getStatusCode());
             ctx.json(Map.of("message", e.getMessage()));
@@ -108,14 +127,15 @@ public class Server {
         javalin.put("/game", ctx -> {
             String authToken = ctx.header("authorization");
             var body = ctx.bodyAsClass(Map.class);
-            Object gameID = body.get("gameID");
+            Object gameIDObj = body.get("gameID");
             String playerColor = (String) body.get("playerColor");
-            if (gameID == null) {
+            if (gameIDObj == null) {
                 ctx.status(400);
                 ctx.json(Map.of("message", "Error: bad request"));
                 return;
             }
-            int currentGameID = (Integer) gameID;
+            // Gson deserializes numbers as Double, so handle both cases
+            int currentGameID = ((Number) gameIDObj).intValue();
             gameService.joinGame(authToken, currentGameID, playerColor);
             ctx.status(200);
             ctx.result("{}");
