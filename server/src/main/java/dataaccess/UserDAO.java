@@ -10,11 +10,11 @@ public class UserDAO {
     private final Map<String, UserData> users = new HashMap<>(); //Key is userName,
 
     public void createUser(UserData user) throws DataAccessException {
-        if (users.containsKey(user.userName())){
+        if (users.containsKey(user.username())){
             throw new DataAccessException("User already exists");
         }
         else {
-            users.put(user.userName(),user);
+            users.put(user.username(),user);
         }
     }
 

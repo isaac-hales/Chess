@@ -51,7 +51,7 @@ public class Server {
         //Register
         javalin.post("/user", ctx -> {
             UserData user = ctx.bodyAsClass(UserData.class);
-            if (isInvalid(user.userName()) || isInvalid(user.userPassword()) || isInvalid(user.userEmail())) {
+            if (isInvalid(user.username()) || isInvalid(user.password()) || isInvalid(user.email())) {
                 ctx.status(400);
                 ctx.json(Map.of("message", "Error: bad request"));
                 return;
@@ -64,8 +64,8 @@ public class Server {
         //Login
         javalin.post("/session", ctx -> {
             UserData user = ctx.bodyAsClass(UserData.class);
-            String username = user.userName();
-            String password = user.userPassword();
+            String username = user.username();
+            String password = user.password();
             if (isInvalid(username) || isInvalid(password)) {
                 ctx.status(400);
                 ctx.result("{ \"message\": \"Error: unauthorized\" }");

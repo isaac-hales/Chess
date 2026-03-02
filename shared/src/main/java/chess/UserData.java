@@ -7,10 +7,6 @@ package chess;
  * Accessor methods userName(), userPassword(), userEmail()
  * equals(), hashCode(), and toString()
  */
-import com.fasterxml.jackson.annotation.JsonProperty;
+public record UserData(String username, String password, String email) {
 
-public record UserData(
-        @JsonProperty("username") String userName,
-        @JsonProperty("password") String userPassword,
-        @JsonProperty("email") String userEmail
-) {}
+}

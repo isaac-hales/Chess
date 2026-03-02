@@ -60,7 +60,7 @@ public class UserServiceTests {
         AuthData result = userService.login(user);
         //Asserting that this is accurate.
         assertNotNull(result);
-        assertEquals("testUser", user.userName());
+        assertEquals("testUser", user.username());
     }
 
     @Test

@@ -17,11 +17,11 @@ public class UserService {
 
     public AuthData register(UserData user) {
         try {
-            if (userDAO.getUser(user.userName()) != null) {
+            if (userDAO.getUser(user.username()) != null) {
                 throw new ServiceException(403, "Error: already taken");
             }
             userDAO.createUser(user);
-            return authDAO.createAuth(user.userName());
+            return authDAO.createAuth(user.username());
         }
         catch (DataAccessException e){
             throw new ServiceException(500, "Error: " + e.getMessage());
@@ -30,14 +30,14 @@ public class UserService {
 
     public AuthData login(UserData user) {
         try {
-            UserData existingUser = userDAO.getUser(user.userName());
+            UserData existingUser = userDAO.getUser(user.username());
             if (existingUser == null) {
                 throw new ServiceException(401, "Error: User does not exist");
             }
-            if (!user.userPassword().equals(existingUser.userPassword())) {
+            if (!user.password().equals(existingUser.password())) {
                 throw new ServiceException(401, "Error: Wrong Password");
             }
-            return authDAO.createAuth(user.userName());
+            return authDAO.createAuth(user.username());
         }
         catch (DataAccessException e) {
             throw new ServiceException(500, "message" + e.getMessage());
