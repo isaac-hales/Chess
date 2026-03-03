@@ -33,20 +33,7 @@ public class Server {
 
     public Server() {
         Gson gson = new Gson();
-        JsonMapper gsonMapper = new JsonMapper() {
-            @NotNull
-            @Override
-            public String toJsonString(@NotNull Object obj, @NotNull Type type) {
-                return gson.toJson(obj, type);
-            }
-
-            @NotNull
-            @Override
-            public <T> T fromJsonString(@NotNull String json, @NotNull Type targetType) {
-                return gson.fromJson(json, targetType);
-            }
-        };
-
+        JsonMapper gsonMapper = createGsonMapper(gson);
         javalin = Javalin.create(config -> {
             config.staticFiles.add("web");
             config.jsonMapper(gsonMapper);
@@ -55,92 +42,106 @@ public class Server {
             ctx.status(e.getStatusCode());
             ctx.json(Map.of("message", e.getMessage()));
         });
-
-        //CLEAR APPLICATION
-        javalin.delete("/db",ctx -> {
-            clearService.clear();
-            ctx.status(200);
-            ctx.result("{}");
-        });
-
-        //Register
-        javalin.post("/user", ctx -> {
-            UserData user = ctx.bodyAsClass(UserData.class);
-            if (isInvalid(user.username()) || isInvalid(user.password()) || isInvalid(user.email())) {
-                ctx.status(400);
-                ctx.json(Map.of("message", "Error: bad request"));
-                return;
-            }
-            AuthData result = userService.register(user);
-            ctx.status(200);
-            ctx.json(result);
-        });
-
-        //Login
-        javalin.post("/session", ctx -> {
-            UserData user = ctx.bodyAsClass(UserData.class);
-            String username = user.username();
-            String password = user.password();
-            if (isInvalid(username) || isInvalid(password)) {
-                ctx.status(400);
-                ctx.result("{ \"message\": \"Error: unauthorized\" }");
-                return;
-            }
-            System.out.println("Returning username: " + user.username());
-            AuthData result = userService.login(user);
-            ctx.status(200);
-            ctx.json(result);
-        });
-
-        //Logout
-        javalin.delete("/session", ctx -> {
-            String authToken = ctx.header("authorization");
-            userService.logout(authToken);
-            ctx.status(200);
-            ctx.result("{}");
-        });
-
-        //List Games
-        javalin.get("/game", ctx -> {
-            String authToken = ctx.header("authorization");
-            Collection<GameData> result = gameService.listGames(authToken);
-            ctx.status(200);
-            ctx.json(Map.of("games",result));
-        });
-
-        //Create Game
-        javalin.post("/game", ctx -> {
-            String authToken = ctx.header("authorization");
-            var body = ctx.bodyAsClass(Map.class);
-            String gameName = (String) body.get("gameName");
-            if (isInvalid(gameName)) {
-                ctx.status(400);
-                ctx.json(Map.of("message", "Error: bad request"));
-                return;
-            }
-            int gameID = gameService.createGame(gameName, authToken);
-            ctx.status(200);
-            ctx.json(Map.of("gameID", gameID));
-        });
-
-        //Join Game
-        javalin.put("/game", ctx -> {
-            String authToken = ctx.header("authorization");
-            var body = ctx.bodyAsClass(Map.class);
-            Object gameIDObj = body.get("gameID");
-            String playerColor = (String) body.get("playerColor");
-            if (gameIDObj == null) {
-                ctx.status(400);
-                ctx.json(Map.of("message", "Error: bad request"));
-                return;
-            }
-            // Gson deserializes numbers as Double, so handle both cases
-            int currentGameID = ((Number) gameIDObj).intValue();
-            gameService.joinGame(authToken, currentGameID, playerColor);
-            ctx.status(200);
-            ctx.result("{}");
-        });
+        registerEndpoints();
     }
+
+    private JsonMapper createGsonMapper(Gson gson) {
+        return new JsonMapper() {
+            @NotNull @Override
+            public String toJsonString(@NotNull Object obj, @NotNull Type type) {
+                return gson.toJson(obj, type);
+            }
+            @NotNull @Override
+            public <T> T fromJsonString(@NotNull String json, @NotNull Type targetType) {
+                return gson.fromJson(json, targetType);
+            }
+        };
+    }
+
+    private void registerEndpoints() {
+        javalin.delete("/db", (ctx) -> handleClear(ctx));
+        javalin.post("/user", (ctx) -> handleRegister(ctx));
+        javalin.post("/session", (ctx) -> handleLogin(ctx));
+        javalin.delete("/session", (ctx) -> handleLogout(ctx));
+        javalin.get("/game", (ctx) -> handleListGames(ctx));
+        javalin.post("/game", (ctx) -> handleCreateGame(ctx));
+        javalin.put("/game", (ctx) -> handleJoinGame(ctx));
+    }
+
+    private void handleClear(io.javalin.http.Context ctx) throws Exception {
+        clearService.clear();
+        ctx.status(200);
+        ctx.result("{}");
+    }
+
+    private void handleRegister(io.javalin.http.Context ctx) {
+        UserData user = ctx.bodyAsClass(UserData.class);
+        if (isInvalid(user.username()) || isInvalid(user.password()) || isInvalid(user.email())) {
+            ctx.status(400);
+            ctx.json(Map.of("message", "Error: bad request"));
+            return;
+        }
+        AuthData result = userService.register(user);
+        ctx.status(200);
+        ctx.json(result);
+    }
+
+    private void handleLogin(io.javalin.http.Context ctx) {
+        UserData user = ctx.bodyAsClass(UserData.class);
+        if (isInvalid(user.username()) || isInvalid(user.password())) {
+            ctx.status(400);
+            ctx.result("{ \"message\": \"Error: unauthorized\" }");
+            return;
+        }
+        AuthData result = userService.login(user);
+        ctx.status(200);
+        ctx.json(result);
+    }
+
+    private void handleLogout(io.javalin.http.Context ctx) {
+        String authToken = ctx.header("authorization");
+        userService.logout(authToken);
+        ctx.status(200);
+        ctx.result("{}");
+    }
+
+    private void handleListGames(io.javalin.http.Context ctx) {
+        String authToken = ctx.header("authorization");
+        Collection<GameData> result = gameService.listGames(authToken);
+        ctx.status(200);
+        ctx.json(Map.of("games", result));
+    }
+
+    private void handleCreateGame(io.javalin.http.Context ctx) {
+        String authToken = ctx.header("authorization");
+        var body = ctx.bodyAsClass(Map.class);
+        String gameName = (String) body.get("gameName");
+        if (isInvalid(gameName)) {
+            ctx.status(400);
+            ctx.json(Map.of("message", "Error: bad request"));
+            return;
+        }
+        int gameID = gameService.createGame(gameName, authToken);
+        ctx.status(200);
+        ctx.json(Map.of("gameID", gameID));
+    }
+
+    private void handleJoinGame(io.javalin.http.Context ctx) {
+        String authToken = ctx.header("authorization");
+        var body = ctx.bodyAsClass(Map.class);
+        Object gameIDObj = body.get("gameID");
+        String playerColor = (String) body.get("playerColor");
+        if (gameIDObj == null) {
+            ctx.status(400);
+            ctx.json(Map.of("message", "Error: bad request"));
+            return;
+        }
+        int currentGameID = ((Number) gameIDObj).intValue();
+        gameService.joinGame(authToken, currentGameID, playerColor);
+        ctx.status(200);
+        ctx.result("{}");
+    }
+
 
     public int run(int desiredPort) {
         javalin.start(desiredPort);

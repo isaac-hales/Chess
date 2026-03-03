@@ -8,84 +8,10 @@ public class PieceMoveCalculator {
     public List<ChessMove> calculateMoves(ChessPosition startPosition, ChessBoard board, ChessPiece piece) {
         final ArrayList<ChessMove> moveList = new ArrayList<>();
         if (piece.getPieceType() == ChessPiece.PieceType.BISHOP) {
-            //Going Down, Right
-            for (int i = 1; i < 8; i++) {
-                int newRow = startPosition.getRow() + i;
-                int newCol = startPosition.getColumn() + i;
-                if (newRow > 8 || newCol > 8){break;}
-                ChessPosition newPosition = new ChessPosition(newRow,newCol);
-                ChessPiece adjacentPiece = board.getPiece(newPosition);
-                //Free spot, good to go.
-                if (adjacentPiece == null){
-                    moveList.add(new ChessMove(startPosition, newPosition,null));
-                }
-                //Capturing an enemy piece
-                else if (adjacentPiece.getTeamColor() != piece.getTeamColor()){
-                    moveList.add(new ChessMove(startPosition, newPosition,null));
-                    break;
-                }
-                //This is a friendly piece.
-                else {break;}
-
-            }
-            //Going Up, Left
-            for (int i = 1; i < 8; i++) {
-                int newRow = startPosition.getRow() + i;
-                int newCol = startPosition.getColumn() - i;
-                if (newRow > 8 || newCol < 1){break;}
-                ChessPosition newPosition = new ChessPosition(newRow,newCol);
-                ChessPiece adjacentPiece = board.getPiece(newPosition);
-                //Free spot, good to go.
-                if (adjacentPiece == null){
-                    moveList.add(new ChessMove(startPosition, newPosition,null));
-                }
-                //Capturing an enemy piece
-                else if (adjacentPiece.getTeamColor() != piece.getTeamColor()){
-                    moveList.add(new ChessMove(startPosition, newPosition,null));
-                    break;
-                }
-                //This is a friendly piece.
-                else {break;}
-            }
-            //Going Down, right
-            for (int i = 1; i < 8; i++) {
-                int newRow = startPosition.getRow() - i;
-                int newCol = startPosition.getColumn() + i;
-                if (newRow < 1 || newCol > 8){break;}
-                ChessPosition newPosition = new ChessPosition(newRow,newCol);
-                ChessPiece adjacentPiece = board.getPiece(newPosition);
-
-                //Free spot, good to go.
-                if (adjacentPiece == null){
-                    moveList.add(new ChessMove(startPosition, newPosition,null));
-                }
-                //Capturing an enemy piece
-                else if (adjacentPiece.getTeamColor() != piece.getTeamColor()){
-                    moveList.add(new ChessMove(startPosition, newPosition,null));
-                    break;
-                }
-                //This is a friendly piece.
-                else {break;}
-            }
-            for (int i = 1; i < 8; i++) {
-                int newRow = startPosition.getRow() - i;
-                int newCol = startPosition.getColumn() - i;
-                if (newRow < 1 || newCol < 1){break;}
-                ChessPosition newPosition = new ChessPosition(newRow,newCol);
-                ChessPiece adjacentPiece = board.getPiece(newPosition);
-
-                //Free spot, good to go.
-                if (adjacentPiece == null){
-                    moveList.add(new ChessMove(startPosition, newPosition,null));
-                }
-                //Capturing an enemy piece
-                else if (adjacentPiece.getTeamColor() != piece.getTeamColor()){
-                    moveList.add(new ChessMove(startPosition, newPosition,null));
-                    break;
-                }
-                //This is a friendly piece.
-                else {break;}
-            }
+            slidingMoves(startPosition, board, piece, 1, 1, moveList);
+            slidingMoves(startPosition, board, piece, 1, -1, moveList);
+            slidingMoves(startPosition, board, piece, -1, 1, moveList);
+            slidingMoves(startPosition, board, piece, -1, -1, moveList);
             return moveList;
         }
         else if (piece.getPieceType() == ChessPiece.PieceType.KING) {
@@ -265,278 +191,50 @@ public class PieceMoveCalculator {
             return moveList;
         }
         else if (piece.getPieceType() == ChessPiece.PieceType.QUEEN) {
-            //Going up the board row subtraction
-            for (int i = 1; i < 8; i++) {
-                int newRow = startPosition.getRow() - i;
-                int newCol = startPosition.getColumn();
-                if (newRow < 1) {
-                    break;
-                }
-                ChessPosition newPosition = new ChessPosition(newRow, newCol);
-                ChessPiece adjacentPiece = board.getPiece(newPosition);
-                //Free spot, good to go.
-                if (adjacentPiece == null) {
-                    moveList.add(new ChessMove(startPosition, newPosition, null));
-                }
-                //Capturing an enemy piece
-                else if (adjacentPiece.getTeamColor() != piece.getTeamColor()) {
-                    moveList.add(new ChessMove(startPosition, newPosition, null));
-                    break;
-                }
-                //This is a friendly piece.
-                else {
-                    break;
-                }
-            }
-            //Going down the board row addition
-            for (int i = 1; i < 8; i++) {
-                int newRow = startPosition.getRow() + i;
-                int newCol = startPosition.getColumn();
-                if (newRow > 8) {
-                    break;
-                }
-                ChessPosition newPosition = new ChessPosition(newRow, newCol);
-                ChessPiece adjacentPiece = board.getPiece(newPosition);
-                //Free spot, good to go.
-                if (adjacentPiece == null) {
-                    moveList.add(new ChessMove(startPosition, newPosition, null));
-                }
-                //Capturing an enemy piece
-                else if (adjacentPiece.getTeamColor() != piece.getTeamColor()) {
-                    moveList.add(new ChessMove(startPosition, newPosition, null));
-                    break;
-                }
-                //This is a friendly piece.
-                else {
-                    break;
-                }
-            }
-            //Going Right column addition
-            for (int i = 1; i < 8; i++) {
-                int newRow = startPosition.getRow();
-                int newCol = startPosition.getColumn() + i;
-                if (newCol > 8) {
-                    break;
-                }
-                ChessPosition newPosition = new ChessPosition(newRow, newCol);
-                ChessPiece adjacentPiece = board.getPiece(newPosition);
-                //Free spot, good to go.
-                if (adjacentPiece == null) {
-                    moveList.add(new ChessMove(startPosition, newPosition, null));
-                }
-                //Capturing an enemy piece
-                else if (adjacentPiece.getTeamColor() != piece.getTeamColor()) {
-                    moveList.add(new ChessMove(startPosition, newPosition, null));
-                    break;
-                }
-                //This is a friendly piece.
-                else {
-                    break;
-                }
-            }
-            //Going Left subtracting Column
-            for (int i = 1; i < 8; i++) {
-                int newRow = startPosition.getRow();
-                int newCol = startPosition.getColumn() - i;
-                if (newCol < 1) {
-                    break;
-                }
-                ChessPosition newPosition = new ChessPosition(newRow, newCol);
-                ChessPiece adjacentPiece = board.getPiece(newPosition);
-                //Free spot, good to go.
-                if (adjacentPiece == null) {
-                    moveList.add(new ChessMove(startPosition, newPosition, null));
-                }
-                //Capturing an enemy piece
-                else if (adjacentPiece.getTeamColor() != piece.getTeamColor()) {
-                    moveList.add(new ChessMove(startPosition, newPosition, null));
-                    break;
-                }
-                //This is a friendly piece.
-                else {
-                    break;
-                }
-            }
+            //Bishop Moves
+            slidingMoves(startPosition, board, piece, 1, 1, moveList);
+            slidingMoves(startPosition, board, piece, 1, -1, moveList);
+            slidingMoves(startPosition, board, piece, -1, 1, moveList);
+            slidingMoves(startPosition, board, piece, -1, -1, moveList);
 
-            //Diagonal moves (like a bishop)
-            //Going Down, Right
-            for (int i = 1; i < 8; i++) {
-                int newRow = startPosition.getRow() + i;
-                int newCol = startPosition.getColumn() + i;
-                if (newRow > 8 || newCol > 8){break;}
-                ChessPosition newPosition = new ChessPosition(newRow,newCol);
-                ChessPiece adjacentPiece = board.getPiece(newPosition);
-                //Free spot, good to go.
-                if (adjacentPiece == null){
-                    moveList.add(new ChessMove(startPosition, newPosition,null));
-                }
-                //Capturing an enemy piece
-                else if (adjacentPiece.getTeamColor() != piece.getTeamColor()){
-                    moveList.add(new ChessMove(startPosition, newPosition,null));
-                    break;
-                }
-                //This is a friendly piece.
-                else {break;}
-            }
-            //Going Up, Right
-            for (int i = 1; i < 8; i++) {
-                int newRow = startPosition.getRow() + i;
-                int newCol = startPosition.getColumn() - i;
-                if (newRow > 8 || newCol < 1){break;}
-                ChessPosition newPosition = new ChessPosition(newRow,newCol);
-                ChessPiece adjacentPiece = board.getPiece(newPosition);
-                //Free spot, good to go.
-                if (adjacentPiece == null){
-                    moveList.add(new ChessMove(startPosition, newPosition,null));
-                }
-                //Capturing an enemy piece
-                else if (adjacentPiece.getTeamColor() != piece.getTeamColor()){
-                    moveList.add(new ChessMove(startPosition, newPosition,null));
-                    break;
-                }
-                //This is a friendly piece.
-                else {break;}
-            }
-            //Going Down, Left
-            for (int i = 1; i < 8; i++) {
-                int newRow = startPosition.getRow() - i;
-                int newCol = startPosition.getColumn() + i;
-                if (newRow < 1 || newCol > 8){break;}
-                ChessPosition newPosition = new ChessPosition(newRow,newCol);
-                ChessPiece adjacentPiece = board.getPiece(newPosition);
-
-                //Free spot, good to go.
-                if (adjacentPiece == null){
-                    moveList.add(new ChessMove(startPosition, newPosition,null));
-                }
-                //Capturing an enemy piece
-                else if (adjacentPiece.getTeamColor() != piece.getTeamColor()){
-                    moveList.add(new ChessMove(startPosition, newPosition,null));
-                    break;
-                }
-                //This is a friendly piece.
-                else {break;}
-            }
-            //Going Up, Left
-            for (int i = 1; i < 8; i++) {
-                int newRow = startPosition.getRow() - i;
-                int newCol = startPosition.getColumn() - i;
-                if (newRow < 1 || newCol < 1){break;}
-                ChessPosition newPosition = new ChessPosition(newRow,newCol);
-                ChessPiece adjacentPiece = board.getPiece(newPosition);
-
-                //Free spot, good to go.
-                if (adjacentPiece == null){
-                    moveList.add(new ChessMove(startPosition, newPosition,null));
-                }
-                //Capturing an enemy piece
-                else if (adjacentPiece.getTeamColor() != piece.getTeamColor()){
-                    moveList.add(new ChessMove(startPosition, newPosition,null));
-                    break;
-                }
-                //This is a friendly piece.
-                else {break;}
-            }
+            //Rook Moves
+            slidingMoves(startPosition, board, piece, 1, 0, moveList);
+            slidingMoves(startPosition, board, piece, -1, 0, moveList);
+            slidingMoves(startPosition, board, piece, 0, 1, moveList);
+            slidingMoves(startPosition, board, piece, 0, -1, moveList);
 
             return moveList;
         }
         else if (piece.getPieceType() == ChessPiece.PieceType.ROOK) {
-            //Going up the board row subtraction
-            for (int i = 1; i < 8; i++) {
-                int newRow = startPosition.getRow() - i;
-                int newCol = startPosition.getColumn();
-                if (newRow < 1) {
-                    break;
-                }
-                ChessPosition newPosition = new ChessPosition(newRow, newCol);
-                ChessPiece adjacentPiece = board.getPiece(newPosition);
-                //Free spot, good to go.
-                if (adjacentPiece == null) {
-                    moveList.add(new ChessMove(startPosition, newPosition, null));
-                }
-                //Capturing an enemy piece
-                else if (adjacentPiece.getTeamColor() != piece.getTeamColor()) {
-                    moveList.add(new ChessMove(startPosition, newPosition, null));
-                    break;
-                }
-                //This is a friendly piece.
-                else {
-                    break;
-                }
-            }
-            //Going down the board row addition
-            for (int i = 1; i < 8; i++) {
-                int newRow = startPosition.getRow() + i;
-                int newCol = startPosition.getColumn();
-                if (newRow > 8) {
-                    break;
-                }
-                ChessPosition newPosition = new ChessPosition(newRow, newCol);
-                ChessPiece adjacentPiece = board.getPiece(newPosition);
-                //Free spot, good to go.
-                if (adjacentPiece == null) {
-                    moveList.add(new ChessMove(startPosition, newPosition, null));
-                }
-                //Capturing an enemy piece
-                else if (adjacentPiece.getTeamColor() != piece.getTeamColor()) {
-                    moveList.add(new ChessMove(startPosition, newPosition, null));
-                    break;
-                }
-                //This is a friendly piece.
-                else {
-                    break;
-                }
-            }
-            //Going Right column addition
-            for (int i = 1; i < 8; i++) {
-                int newRow = startPosition.getRow();
-                int newCol = startPosition.getColumn() + i;
-                if (newCol > 8) {
-                    break;
-                }
-                ChessPosition newPosition = new ChessPosition(newRow, newCol);
-                ChessPiece adjacentPiece = board.getPiece(newPosition);
-                //Free spot, good to go.
-                if (adjacentPiece == null) {
-                    moveList.add(new ChessMove(startPosition, newPosition, null));
-                }
-                //Capturing an enemy piece
-                else if (adjacentPiece.getTeamColor() != piece.getTeamColor()) {
-                    moveList.add(new ChessMove(startPosition, newPosition, null));
-                    break;
-                }
-                //This is a friendly piece.
-                else {
-                    break;
-                }
-            }
-            //Going Left subtracting Column
-            for (int i = 1; i < 8; i++) {
-                int newRow = startPosition.getRow();
-                int newCol = startPosition.getColumn() - i;
-                if (newCol < 1) {
-                    break;
-                }
-                ChessPosition newPosition = new ChessPosition(newRow, newCol);
-                ChessPiece adjacentPiece = board.getPiece(newPosition);
-                //Free spot, good to go.
-                if (adjacentPiece == null) {
-                    moveList.add(new ChessMove(startPosition, newPosition, null));
-                }
-                //Capturing an enemy piece
-                else if (adjacentPiece.getTeamColor() != piece.getTeamColor()) {
-                    moveList.add(new ChessMove(startPosition, newPosition, null));
-                    break;
-                }
-                //This is a friendly piece.
-                else {
-                    break;
-                }
-            }
+            slidingMoves(startPosition, board, piece, 1, 0, moveList);
+            slidingMoves(startPosition, board, piece, -1, 0, moveList);
+            slidingMoves(startPosition, board, piece, 0, 1, moveList);
+            slidingMoves(startPosition, board, piece, 0, -1, moveList);
             return moveList;
         }
         else {
             throw new RuntimeException("INVALID PIECE! WHAT DID YOU DO?!?!");
+        }
+    }
+
+    private void slidingMoves(ChessPosition start, ChessBoard board, ChessPiece piece,
+                              int rowDir, int colDir, List<ChessMove> moveList) {
+        for (int i = 1; i < 8; i++) {
+            int newRow = start.getRow() + i * rowDir;
+            int newCol = start.getColumn() + i * colDir;
+            if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) {
+                break;
+            }
+            ChessPosition newPos = new ChessPosition(newRow, newCol);
+            ChessPiece target = board.getPiece(newPos);
+            if (target == null) {
+                moveList.add(new ChessMove(start, newPos, null));
+            } else if (target.getTeamColor() != piece.getTeamColor()) {
+                moveList.add(new ChessMove(start, newPos, null));
+                break;
+            } else {
+                break;
+            }
         }
     }
 }
