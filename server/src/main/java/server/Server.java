@@ -3,9 +3,7 @@ package server;
 import chess.AuthData;
 import chess.GameData;
 import chess.UserData;
-import dataaccess.AuthDAO;
-import dataaccess.GameDAO;
-import dataaccess.UserDAO;
+import dataaccess.*;
 import io.javalin.*;
 import service.ClearService;
 import service.GameService;
@@ -43,6 +41,13 @@ public class Server {
             ctx.json(Map.of("message", e.getMessage()));
         });
         registerEndpoints();
+        try {
+            DatabaseManager.createDatabase();
+            DatabaseManager.createTables();
+        }
+        catch (DataAccessException e) {
+            throw new RuntimeException("Failed to initialize database", e);
+        }
     }
 
     private JsonMapper createGsonMapper(Gson gson) {

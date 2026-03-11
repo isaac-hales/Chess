@@ -8,6 +8,7 @@ public class DatabaseManager {
     private static String dbUsername;
     private static String dbPassword;
     private static String connectionUrl;
+    private static String tableName;
 
     /*
      * Load the database information for the db.properties file.
@@ -26,6 +27,16 @@ public class DatabaseManager {
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
             throw new DataAccessException("failed to create database", ex);
+        }
+    }
+
+    static public void createTables() throws DataAccessException {
+        var statement = "CREATE TABLE IF NOT EXISTS " + tableName;
+        try (var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
+             var preparedStatement = conn.prepareStatement(statement)) {
+            preparedStatement.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DataAccessException("failed to create table", ex);
         }
     }
 
