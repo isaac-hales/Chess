@@ -8,7 +8,6 @@ public class DatabaseManager {
     private static String dbUsername;
     private static String dbPassword;
     private static String connectionUrl;
-    private static String tableName;
 
     /*
      * Load the database information for the db.properties file.
@@ -31,12 +30,38 @@ public class DatabaseManager {
     }
 
     static public void createTables() throws DataAccessException {
-        var statement = "CREATE TABLE IF NOT EXISTS " + tableName;
-        try (var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
-             var preparedStatement = conn.prepareStatement(statement)) {
-            preparedStatement.executeUpdate();
+        String[] statements = {
+                """
+        CREATE TABLE IF NOT EXISTS users (
+            username TEXT NOT NULL,
+            email VARCHAR(256) NOT NULL,
+            hashedPassword VARCHAR(256) NOT NULL
+        )
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS games (
+            gameID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            whiteUsername TEXT NULL,
+            blackUsername TEXT NULL,
+            gameName TEXT NOT NULL,
+            chessGame TEXT NOT NULL
+        )
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS auth (
+            username TEXT NOT NULL,
+            authToken VARCHAR(256) NOT NULL
+        )
+        """
+        };
+        try (var conn = getConnection()) {
+            for (var statement : statements) {
+                Statement stmnt = conn.createStatement();
+                stmnt.execute(statement);
+                System.out.println("Table created ...");
+            }
         } catch (SQLException ex) {
-            throw new DataAccessException("failed to create table", ex);
+            throw new DataAccessException("failed to create tables", ex);
         }
     }
 
