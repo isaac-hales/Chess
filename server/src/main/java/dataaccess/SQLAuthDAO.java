@@ -1,11 +1,10 @@
 package dataaccess;
 
 import chess.AuthData;
-import chess.UserData;
 
 import java.sql.SQLException;
 
-public class SQLAuthDAO {
+public class SQLAuthDAO implements AuthDAOInterface{
 
     public AuthData createAuth(String username) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
@@ -49,7 +48,7 @@ public class SQLAuthDAO {
         }
     }
 
-    public void clearAuthTokens() throws DataAccessException {
+    public void clear() throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("TRUNCATE TABLE auth")) {
                 preparedStatement.executeUpdate();
