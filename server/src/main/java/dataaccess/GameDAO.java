@@ -8,16 +8,21 @@ import java.util.Map;
 
 public class GameDAO implements GameDAOInterface {
     private final Map<Integer, GameData> allChessGames = new HashMap<>(); //integer is key, and GameData is value
+    private int nextGameID = 1; // Auto-increment counter starting at 1
 
     public Collection<GameData> listGames() {
         return allChessGames.values();
     }
 
-    public void createGame(GameData game) throws DataAccessException {
+    public int createGame(GameData game) throws DataAccessException {
         if (game == null){
             throw new DataAccessException("Game does not exist");
         }
-        allChessGames.put(game.gameID(), game);
+        // Generate new ID and create GameData with that ID
+        int gameID = nextGameID++;
+        GameData newGame = new GameData(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
+        allChessGames.put(gameID, newGame);
+        return gameID;
     }
 
     public GameData getGame(int gameID){

@@ -3,8 +3,10 @@ import server.Server;
 import io.javalin.*;
 
 public class ServerMain {
+
     public static void main(String[] args) {
         //Creating the server with Javalin
+
         Server server = new Server();
         server.run(8080);
 

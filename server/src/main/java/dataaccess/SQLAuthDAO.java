@@ -23,12 +23,12 @@ public class SQLAuthDAO implements AuthDAOInterface{
 
     public AuthData getAuth(String authToken) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("SELECT username, authToken FROM authTokens WHERE authToken = ?")) {
+            try (var preparedStatement = conn.prepareStatement("SELECT username, authToken FROM auth WHERE authToken = ?")) {
                 preparedStatement.setString(1,authToken);
                 var results = preparedStatement.executeQuery();
                 if (results.next()) {
-                    return new AuthData(results.getString("username"),
-                            results.getString("authToken"));
+                    return new AuthData(results.getString("authToken"),
+                            results.getString("username"));
                 }
                 return null; //User is not found.
             }
@@ -50,7 +50,7 @@ public class SQLAuthDAO implements AuthDAOInterface{
 
     @Override
     public void clearAuth() throws DataAccessException {
-
+        clear();
     }
 
     public void clear() throws DataAccessException {

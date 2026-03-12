@@ -33,14 +33,13 @@ public class GameService {
             if (authDAO.getAuth(authToken) == null) {
                 throw new ServiceException(401, "Error: unauthorized");
             }
-            int gameID = gameDAO.listGames().size() + 1;
-            GameData newGame = new GameData(gameID, null, null, gameName, new ChessGame());
-            ;
-            gameDAO.createGame(newGame);
-            return newGame.gameID();
+            GameData newGame = new GameData(0, null, null, gameName, new ChessGame());
+            int gameID = gameDAO.createGame(newGame);
+            System.out.println("Created game with ID: " + gameID);
+            return gameID;
         }
         catch (DataAccessException e){
-            throw new ServiceException(500, "message" + e.getMessage());
+            throw new ServiceException(500, "Error: " + e.getMessage());
         }
     }
 
@@ -71,7 +70,7 @@ public class GameService {
             gameDAO.updateGame(updatedGame);
         }
         catch (DataAccessException e) {
-            throw new ServiceException(500, "message" + e.getMessage());
+            throw new ServiceException(500, "Error: " + e.getMessage());
         }
 
     }

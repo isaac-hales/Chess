@@ -33,10 +33,10 @@ public class DatabaseManager {
         String[] statements = {
                 """
         CREATE TABLE IF NOT EXISTS users (
-            username TEXT NOT NULL,
-            email VARCHAR(256) NOT NULL,
-            hashedPassword VARCHAR(256) NOT NULL
-        )
+             username VARCHAR(256) NOT NULL PRIMARY KEY,
+             email VARCHAR(256) NOT NULL,
+             hashedPassword VARCHAR(256) NOT NULL
+         )
         """,
         """
         CREATE TABLE IF NOT EXISTS games (
@@ -58,7 +58,7 @@ public class DatabaseManager {
             for (var statement : statements) {
                 Statement stmnt = conn.createStatement();
                 stmnt.execute(statement);
-                System.out.println("Table created ...");
+                System.out.println("Database initialized successfully");
             }
         } catch (SQLException ex) {
             throw new DataAccessException("failed to create tables", ex);

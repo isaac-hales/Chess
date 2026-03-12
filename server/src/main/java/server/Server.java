@@ -73,10 +73,15 @@ public class Server {
         javalin.put("/game", (ctx) -> handleJoinGame(ctx));
     }
 
-    private void handleClear(io.javalin.http.Context ctx) throws Exception {
-        clearService.clear();
-        ctx.status(200);
-        ctx.result("{}");
+    private void handleClear(io.javalin.http.Context ctx) {
+        try {
+            clearService.clear();
+            ctx.status(200);
+            ctx.result("{}");
+        } catch (DataAccessException e) {
+            ctx.status(500);
+            ctx.json(Map.of("message", "Error: " + e.getMessage()));
+        }
     }
 
     private void handleRegister(io.javalin.http.Context ctx) {

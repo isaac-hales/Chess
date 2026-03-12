@@ -1,7 +1,6 @@
 package dataaccess;
 
 import chess.UserData;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
 
@@ -9,14 +8,13 @@ public class SQLUserDAO implements UserDAOInterface {
     public void createUser(UserData user) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("INSERT INTO users (username, email, hashedPassword) VALUES(?, ?, ?)")) {
-                String password = user.password();
-                String hashPassword = BCrypt.hashpw(password, BCrypt.gensalt());
                 preparedStatement.setString(1, user.username());
                 preparedStatement.setString(2, user.email());
-                preparedStatement.setString(3,hashPassword);
+                preparedStatement.setString(3, user.password());
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new DataAccessException("error message", e);
         }
     }
@@ -34,6 +32,7 @@ public class SQLUserDAO implements UserDAOInterface {
                 return null; //User is not found.
             }
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new DataAccessException("error message", e);
         }
     }
@@ -45,6 +44,7 @@ public class SQLUserDAO implements UserDAOInterface {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new DataAccessException("error message", e);
         }
     }

@@ -14,13 +14,12 @@ public class SQLGameDAO implements GameDAOInterface {
 
     public int createGame(GameData game) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("INSERT INTO games (gameID, gameName, whiteUsername, blackUsername, chessGame) VALUES(?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+            try (var preparedStatement = conn.prepareStatement("INSERT INTO games ( gameName, whiteUsername, blackUsername, chessGame) VALUES(?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
                 String chessGameJson = new Gson().toJson(game.game());
-                preparedStatement.setInt(1, game.gameID());
-                preparedStatement.setString(2, game.gameName());
-                preparedStatement.setString(3, game.whiteUsername());
-                preparedStatement.setString(4, game.blackUsername());
-                preparedStatement.setString(5, chessGameJson);
+                preparedStatement.setString(1, game.gameName());
+                preparedStatement.setString(2, game.whiteUsername());
+                preparedStatement.setString(3, game.blackUsername());
+                preparedStatement.setString(4, chessGameJson);
                 preparedStatement.executeUpdate();
                 var generatedKeys = preparedStatement.getGeneratedKeys();
                 if (generatedKeys.next()) {
@@ -29,7 +28,9 @@ public class SQLGameDAO implements GameDAOInterface {
                 throw new DataAccessException("No gameID generated");
             }
         } catch (SQLException e) {
+            System.out.println("createGame failed: " + e.getMessage());
             throw new DataAccessException("error message", e);
+
         }
     }
 
