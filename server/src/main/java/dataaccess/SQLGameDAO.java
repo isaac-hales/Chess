@@ -6,14 +6,15 @@ import com.google.gson.Gson;
 
 
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class SQLGameDAO implements GameDAOInterface {
 
-    public void createGame(GameData game) throws DataAccessException {
+    public int createGame(GameData game) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("INSERT INTO games (gameID, gameName, whiteUsername, blackUsername, chessGame) VALUES(?, ?, ?, ?, ?)")) {
+            try (var preparedStatement = conn.prepareStatement("INSERT INTO games (gameID, gameName, whiteUsername, blackUsername, chessGame) VALUES(?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
                 String chessGameJson = new Gson().toJson(game.game());
                 preparedStatement.setInt(1, game.gameID());
                 preparedStatement.setString(2, game.gameName());
@@ -21,6 +22,11 @@ public class SQLGameDAO implements GameDAOInterface {
                 preparedStatement.setString(4, game.blackUsername());
                 preparedStatement.setString(5, chessGameJson);
                 preparedStatement.executeUpdate();
+                var generatedKeys = preparedStatement.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    return generatedKeys.getInt(1);
+                }
+                throw new DataAccessException("No gameID generated");
             }
         } catch (SQLException e) {
             throw new DataAccessException("error message", e);
@@ -81,7 +87,7 @@ public class SQLGameDAO implements GameDAOInterface {
         }
     }
 
-    public void clearGames() throws DataAccessException {
+    public void clear() throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("TRUNCATE TABLE games")) {
                 preparedStatement.executeUpdate();

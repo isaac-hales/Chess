@@ -48,6 +48,11 @@ public class SQLAuthDAO implements AuthDAOInterface{
         }
     }
 
+    @Override
+    public void clearAuth() throws DataAccessException {
+
+    }
+
     public void clear() throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("TRUNCATE TABLE auth")) {

@@ -2,11 +2,10 @@ package dataaccess;
 
 
 import chess.UserData;
-
 import java.util.HashMap;
 import java.util.Map;
 
-public class UserDAO {
+public class UserDAO implements UserDAOInterface {
     private final Map<String, UserData> users = new HashMap<>(); //Key is userName,
 
     public void createUser(UserData user) throws DataAccessException {

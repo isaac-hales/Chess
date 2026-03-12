@@ -20,9 +20,9 @@ public class Server {
 
     private final Javalin javalin;
     //Storage for the users logging in, and the authTokens
-    private final UserDAO userDAO = new UserDAO();
-    private final GameDAO gameDAO = new GameDAO();
-    private final AuthDAO authDAO = new AuthDAO();
+    private final UserDAOInterface userDAO = new SQLUserDAO();
+    private final GameDAOInterface gameDAO = new SQLGameDAO();
+    private final AuthDAOInterface authDAO = new SQLAuthDAO();
 
     //Giving the DAOs to the Services, like army, navy
     private final UserService userService = new UserService(userDAO, authDAO);

@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GameDAO {
+public class GameDAO implements GameDAOInterface {
     private final Map<Integer, GameData> allChessGames = new HashMap<>(); //integer is key, and GameData is value
 
     public Collection<GameData> listGames() {

@@ -5,7 +5,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
 
-public class SQLUserDAO {
+public class SQLUserDAO implements UserDAOInterface {
     public void createUser(UserData user) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("INSERT INTO users (username, email, hashedPassword) VALUES(?, ?, ?)")) {
@@ -38,7 +38,8 @@ public class SQLUserDAO {
         }
     }
 
-    public void clearUsers() throws DataAccessException {
+
+    public void clear() throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("TRUNCATE TABLE users")) {
                 preparedStatement.executeUpdate();

@@ -2,28 +2,30 @@ package service;
 
 import chess.ChessGame;
 import chess.GameData;
-import dataaccess.AuthDAO;
-import dataaccess.DataAccessException;
-import dataaccess.GameDAO;
+import dataaccess.*;
 
 import java.util.Collection;
 
 public class GameService {
 
 
-    private final AuthDAO authDAO;
-    private final GameDAO gameDAO;
+    private final AuthDAOInterface authDAO;
+    private final GameDAOInterface gameDAO;
 
-    public GameService(AuthDAO authDAO, GameDAO gameDAO) {
+    public GameService(AuthDAOInterface authDAO, GameDAOInterface gameDAO) {
         this.authDAO = authDAO;
         this.gameDAO = gameDAO;
     }
 
     public Collection<GameData> listGames(String authToken) {
-        if (authDAO.getAuth(authToken) == null){
-            throw new ServiceException(401, "Error: unauthorized");
+        try {
+            if (authDAO.getAuth(authToken) == null) {
+                throw new ServiceException(401, "Error: unauthorized");
+            }
+            return gameDAO.listGames();
+        } catch (DataAccessException e) {
+            throw new ServiceException(500, "Error: " + e.getMessage());
         }
-        return gameDAO.listGames();
     }
 
     public int createGame(String gameName,String authToken) {

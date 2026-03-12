@@ -1,16 +1,14 @@
 package service;
 import chess.AuthData;
 import chess.UserData;
-import dataaccess.AuthDAO;
-import dataaccess.DataAccessException;
-import dataaccess.UserDAO;
+import dataaccess.*;
 
 public class UserService {
 
-    private final UserDAO userDAO;
-    private final AuthDAO authDAO;
+    private final UserDAOInterface userDAO;
+    private final AuthDAOInterface authDAO;
 
-    public UserService(UserDAO userDAO, AuthDAO authDAO){
+    public UserService(UserDAOInterface userDAO, AuthDAOInterface authDAO) {
         this.userDAO = userDAO;
         this.authDAO = authDAO;
     }
