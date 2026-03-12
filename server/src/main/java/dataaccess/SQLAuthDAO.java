@@ -9,14 +9,12 @@ public class SQLAuthDAO {
 
     public AuthData createAuth(String username) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("INSERT INTO auth ")) {
-                preparedStatement.setString(1,username);
+            try (var preparedStatement = conn.prepareStatement("INSERT INTO auth(username, authToken) VALUES(?, ?) ")) {
                 AuthData newAuth = AuthData.create(username);
-                var results = preparedStatement.executeUpdate();
-                if (results.next()) {
-                    return newAuth;
-                }
-                return null; //User is not found.
+                preparedStatement.setString(1, username);
+                preparedStatement.setString(2, newAuth.authToken());
+                preparedStatement.executeUpdate();
+                return newAuth;
             }
         }
         catch (SQLException e) {
@@ -24,14 +22,14 @@ public class SQLAuthDAO {
         }
     }
 
-    public AuthData getAuth(String username) throws DataAccessException {
+    public AuthData getAuth(String authToken) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("SELECT username, authorization FROM authTokens WHERE username = ?")) {
-                preparedStatement.setString(1,username);
+            try (var preparedStatement = conn.prepareStatement("SELECT username, authToken FROM authTokens WHERE authToken = ?")) {
+                preparedStatement.setString(1,authToken);
                 var results = preparedStatement.executeQuery();
                 if (results.next()) {
                     return new AuthData(results.getString("username"),
-                            results.getString("authorization"));
+                            results.getString("authToken"));
                 }
                 return null; //User is not found.
             }
@@ -40,8 +38,15 @@ public class SQLAuthDAO {
         }
     }
 
-    public void deleteAuth(String username) throws DataAccessException {
-
+    public void deleteAuth(String authToken) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("DELETE FROM auth WHERE authToken = ?")) {
+                preparedStatement.setString(1,authToken);
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("error message", e);
+        }
     }
 
     public void clearAuthTokens() throws DataAccessException {
