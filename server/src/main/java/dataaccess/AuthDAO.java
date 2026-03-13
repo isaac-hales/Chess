@@ -24,11 +24,6 @@ public class AuthDAO implements AuthDAOInterface {
         authTokens.remove(authToken);
     }
 
-    @Override
-    public void clearAuth() throws DataAccessException {
-
-    }
-
     public void clear(){
         authTokens.clear();
     }

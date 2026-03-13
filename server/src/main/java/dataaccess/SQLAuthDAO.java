@@ -48,10 +48,6 @@ public class SQLAuthDAO implements AuthDAOInterface{
         }
     }
 
-    @Override
-    public void clearAuth() throws DataAccessException {
-        clear();
-    }
 
     public void clear() throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
