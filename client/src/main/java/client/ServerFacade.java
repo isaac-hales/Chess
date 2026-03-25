@@ -1,7 +1,6 @@
 package client;
 
 import chess.AuthData;
-import chess.ChessGame;
 import chess.GameData;
 import chess.UserData;
 import com.google.gson.Gson;
@@ -9,12 +8,16 @@ import com.google.gson.Gson;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.util.Collection;
+import java.util.Map;
 
 public class ServerFacade {
     private final String serverUrl;
     private final Gson gson = new Gson();
     private record CreateGameRequest(String gameName) {}
     private record CreateGameResult(int gameID) {}
+    private record ListGamesResult(Collection<GameData> games) {}
+    private record JoinGameRequest(String playerColor, int gameID) {}
 
     public ServerFacade(int port) {
         serverUrl = "http://localhost:" + port;
@@ -35,6 +38,13 @@ public class ServerFacade {
             try (var outputStream = connection.getOutputStream()) {
                 var json = gson.toJson(requestBody);
                 outputStream.write(json.getBytes());
+            }
+        }
+        var statusCode = connection.getResponseCode();
+        if (statusCode != 200) {
+            try (var errorStream = connection.getErrorStream()) {
+                var error = gson.fromJson(new InputStreamReader(errorStream), Map.class);
+                throw new Exception(error.get("message").toString());
             }
         }
         if (responseClass != null) {
@@ -64,6 +74,17 @@ public class ServerFacade {
         var result = makeRequest("POST", "/game", request, CreateGameResult.class, authToken);
         return result.gameID();
     }
+
+    public Collection<GameData> listGames(String authToken) throws Exception {
+        var result = makeRequest("GET", "/game", null, ListGamesResult.class, authToken);
+        return result.games();
+    }
+
+    public void joinGame(String authToken, int gameID, String playerColor) throws Exception {
+        var request = new JoinGameRequest(playerColor,gameID);
+        makeRequest("PUT","/game",request,null,authToken);
+    }
+
 }
 
 
