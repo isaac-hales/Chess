@@ -24,6 +24,10 @@ public class ServerFacade {
 
     }
 
+    public void clear() throws Exception{
+        makeRequest("DELETE", "/db", null,null,null);
+    }
+
     private <T> T makeRequest(String method, String path, Object requestBody, Class<T> responseClass, String authToken) throws Exception{
         var url = new URI(serverUrl + path).toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -40,6 +44,7 @@ public class ServerFacade {
                 outputStream.write(json.getBytes());
             }
         }
+
         var statusCode = connection.getResponseCode();
         if (statusCode != 200) {
             try (var errorStream = connection.getErrorStream()) {
@@ -47,6 +52,7 @@ public class ServerFacade {
                 throw new Exception(error.get("message").toString());
             }
         }
+
         if (responseClass != null) {
             try (var inputStream = connection.getInputStream()) {
                 return gson.fromJson(new InputStreamReader(inputStream), responseClass);
