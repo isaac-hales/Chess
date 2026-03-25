@@ -92,29 +92,3 @@ public class ServerFacade {
     }
 
 }
-
-
-/***
- * // 1. Build the URL
- * var url = new URI(serverUrl + "/user").toURL();
- *
- * // 2. Open a connection
- * HttpURLConnection connection = (HttpURLConnection) url.openConnection();
- *
- * // 3. Set the request method
- * connection.setRequestMethod("POST");
- *
- * // 4. Set headers if needed (like Content-Type or Authorization)
- * connection.setRequestProperty("Content-Type", "application/json");
- *
- * // 5. Write the request body if needed
- * connection.setDoOutput(true);
- * try (var outputStream = connection.getOutputStream()) {
- *     // write JSON body here using Gson
- * }
- *
- * // 6. Read the response
- * try (var inputStream = connection.getInputStream()) {
- *     // read JSON response here using Gson
- * }
- */
