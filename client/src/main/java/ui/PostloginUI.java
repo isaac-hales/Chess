@@ -82,21 +82,17 @@ public class PostloginUI {
             case "observe" -> {
                 if (parts.length != 2) {
                     return "Usage: observe <ID>";
-                }
-                try {
+                }try {
                     int listNumber = Integer.parseInt(parts[1]);
                     int realGameID = lastGameList.get(listNumber - 1).gameID();
                     BoardDrawing.drawBoard(new ChessGame().getBoard(), true);
                     return "Observing game " + parts[1];
-                }
-                catch (NumberFormatException e) {
+                } catch (NumberFormatException e) {
                     return "Please enter a valid number for gameID, and not the game name. ";
-                }
-                catch (IndexOutOfBoundsException e) {
+                } catch (IndexOutOfBoundsException e) {
                     return "Please choose a number between 1 and " + lastGameList.size() + ". " +
                             "The number you gave, " + parts[1] + ", is out of bounds.";
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     return "Observe failed: " + e.getMessage() + " - Please use a number!";
                 }
             }
