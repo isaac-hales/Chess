@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-
 public class PostloginUI {
     private final ServerFacade facade;
     private String authToken = null;
@@ -17,7 +16,6 @@ public class PostloginUI {
         this.facade = facade;
         this.authToken = authToken;
     }
-
     public String eval(String input) {
         var parts = input.split(" ");
         var cmd = parts[0].toLowerCase().trim();
@@ -82,7 +80,7 @@ public class PostloginUI {
             case "observe" -> {
                 if (parts.length != 2) {
                     return "Usage: observe <ID>";
-                }try {
+                } try {
                     int listNumber = Integer.parseInt(parts[1]);
                     int realGameID = lastGameList.get(listNumber - 1).gameID();
                     BoardDrawing.drawBoard(new ChessGame().getBoard(), true);
@@ -117,5 +115,4 @@ public class PostloginUI {
         }
         return "Unknown error. Type 'help' for options.";
     }
-
 }
