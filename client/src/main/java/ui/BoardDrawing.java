@@ -11,71 +11,42 @@ public class BoardDrawing {
 
 
     public static void drawBoard(ChessBoard board, boolean isWhitePerspective) {
-        if (isWhitePerspective) {
-            System.out.println(SET_BG_COLOR_DARK_GREY + "    a   b   c  d   e   f  g   h    " + RESET_BG_COLOR);
-            for (int i = 8; i >= 1; i--) {
-                System.out.print(SET_BG_COLOR_DARK_GREY + " " + i + " " + RESET_BG_COLOR);
-                for (int j = 1; j < 9; j++) {
-                    ChessPosition tempPosition = new ChessPosition(i,j);
-                    ChessPiece tempPiece = board.getPiece(tempPosition);
-                    if ((i + j) % 2 != 0) {
-                        System.out.print(SET_BG_COLOR_WHITE);
-                    }
-                    else {
-                        System.out.print(SET_BG_COLOR_DARK_GREEN);
-                    }
-                    if (tempPiece != null) {
-                        if (tempPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                            System.out.print(SET_TEXT_COLOR_BLUE);
-                        }
-                        else {
-                            System.out.print(SET_TEXT_COLOR_MAGENTA);
-                        }
-                    }
-                    System.out.print(getPieceSymbol(tempPiece));
-                    System.out.print(RESET_TEXT_COLOR);
-                    System.out.print(RESET_BG_COLOR);
-                }
-                System.out.print(SET_BG_COLOR_DARK_GREY + " " + i + " " + RESET_BG_COLOR);
-                System.out.println();
-            }
-            System.out.println(SET_BG_COLOR_DARK_GREY + "    a   b   c  d   e   f  g   h    " + RESET_BG_COLOR);
+        String borderLetters = isWhitePerspective ?
+                "    a  b  c  d  e  f  g  h    " :
+                "    h  g  f  e  d  c  b  a    ";
+        System.out.println(SET_BG_COLOR_DARK_GREY + borderLetters + RESET_BG_COLOR);
+
+        int rowStart = isWhitePerspective ? 8 : 1;
+        int rowEnd = isWhitePerspective ? 0 : 9;
+        int rowStep = isWhitePerspective ? -1 : 1;
+
+        for (int i = rowStart; i != rowEnd; i += rowStep) {
+            printRow(board, i, isWhitePerspective);
         }
-        else {
-            for (int i = 1; i < 9; i++) {
-                for (int j = 8; j >= 1; j--) {
-                    ChessPosition tempPosition = new ChessPosition(i,j);
-                    ChessPiece tempPiece = board.getPiece(tempPosition);
-                    if ((i + j) % 2 != 0) {
-                        System.out.print(SET_BG_COLOR_WHITE);
-                    }
-                    else {
-                        System.out.print(SET_BG_COLOR_DARK_GREEN);
-                    }
-                    if (tempPiece != null) {
-                        if (tempPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                            System.out.print(SET_TEXT_COLOR_BLUE);
-                        }
-                        else {
-                            System.out.print(SET_TEXT_COLOR_MAGENTA);
-                        }
-                    }
-                    System.out.print(getPieceSymbol(tempPiece));
-                    System.out.print(RESET_TEXT_COLOR);
-                    System.out.print(RESET_BG_COLOR);
-                }
-                System.out.println();
-            }
+        System.out.println(SET_BG_COLOR_DARK_GREY + borderLetters + RESET_BG_COLOR);
+    }
+
+    private static void printRow(ChessBoard board, int row, boolean isWhitePerspective) {
+        System.out.print(SET_BG_COLOR_DARK_GREY + " " + row + " " + RESET_BG_COLOR);
+        int colStart = isWhitePerspective ? 1 : 8;
+        int colEnd = isWhitePerspective ? 9 : 0;
+        int colStep = isWhitePerspective ? 1 : -1;
+        for (int j = colStart; j != colEnd; j += colStep) {
+            printSquare(board.getPiece(new ChessPosition(row, j)), row, j);
         }
-        // print top border with column letters
-        // loop through rows
-        //   print row number on left border
-        //   loop through columns
-        //     get piece at position
-        //     set background color based on square color
-        //     print piece symbol
-        //   print row number on right border
-        // print bottom border with column letters
+        System.out.print(SET_BG_COLOR_DARK_GREY + " " + row + " " + RESET_BG_COLOR);
+        System.out.println();
+    }
+
+    private static void printSquare(ChessPiece piece, int row, int col) {
+        System.out.print((row + col) % 2 != 0 ? SET_BG_COLOR_WHITE : SET_BG_COLOR_DARK_GREEN);
+        if (piece != null) {
+            System.out.print(piece.getTeamColor() == ChessGame.TeamColor.WHITE ?
+                    SET_TEXT_COLOR_BLUE : SET_TEXT_COLOR_MAGENTA);
+        }
+        System.out.print(getPieceSymbol(piece));
+        System.out.print(RESET_TEXT_COLOR);
+        System.out.print(RESET_BG_COLOR);
     }
 
     private static String getPieceSymbol(ChessPiece piece) {
