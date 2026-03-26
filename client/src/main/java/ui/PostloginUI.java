@@ -1,9 +1,13 @@
 package ui;
+import chess.ChessBoard;
+import chess.ChessGame;
 import chess.GameData;
 import client.ServerFacade;
 
 import java.util.Collection;
 import java.util.List;
+
+import static ui.BoardDrawing.drawBoard;
 
 public class PostloginUI {
     private final ServerFacade facade;
@@ -58,23 +62,23 @@ public class PostloginUI {
             }
             case "join" -> {
                 if (parts.length != 3) {
-                    return "Usage: join <ID> <WHITE / BLACK>";
+                    return "Usage: join <ID> [WHITE|BLACK]";
                 }
                 try {
-                    facade.joinGame(authToken,Integer.parseInt(parts[1]),parts[2]);
-                    return "joined game " + parts[1];
-                }
-                catch (Exception e) {
-                    return "join failed: " + e.getMessage();
+                    facade.joinGame(authToken, Integer.parseInt(parts[1]), parts[2]);
+                    boolean isWhite = parts[2].equalsIgnoreCase("WHITE");
+                    BoardDrawing.drawBoard(new ChessGame().getBoard(), isWhite);
+                    return "Joined game " + parts[1];
+                } catch (Exception e) {
+                    return "Join failed: " + e.getMessage();
                 }
             }
             case "observe" -> {
                 if (parts.length != 2) {
-                    return "Observing game " + parts[1];
+                    return "Usage: observe <" + parts[1] + ">";
                 }
-                else {
-                    return "Observation failed???";
-                }
+                BoardDrawing.drawBoard(new ChessGame().getBoard(), true);
+                return "Observing game " + parts[1];
             }
             case "logout" -> {
                 try {
