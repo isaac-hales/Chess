@@ -50,7 +50,7 @@ public class PostloginUI {
                     StringBuilder allGames = new StringBuilder();
                     int number = 1;
                     for (GameData game : tempList) {
-                        allGames.append(game.gameName())
+                        allGames.append(number).append(". ").append(game.gameName())
                             .append(" | White: ").append(game.whiteUsername() != null ? game.whiteUsername() : "empty")
                             .append(" | Black: ").append(game.blackUsername() != null ? game.blackUsername() : "empty")
                             .append("\n");
@@ -66,7 +66,7 @@ public class PostloginUI {
             }
             case "join" -> {
                 if (parts.length != 3) {
-                    return "Usage: join <ID> [WHITE|BLACK]";
+                    return "Usage: join <ID> [WHITE / BLACK]";
                 }
                 try {
                     int listNumber = Integer.parseInt(parts[1]);
@@ -80,13 +80,17 @@ public class PostloginUI {
                 }
             }
             case "observe" -> {
-                int listNumber = Integer.parseInt(parts[1]);
-                int realGameID = lastGameList.get(listNumber - 1).gameID();
                 if (parts.length != 2) {
                     return "Usage: observe <ID>";
                 }
-                BoardDrawing.drawBoard(new ChessGame().getBoard(), true);
-                return "Observing game " + parts[1];
+                try {
+                    int listNumber = Integer.parseInt(parts[1]);
+                    int realGameID = lastGameList.get(listNumber - 1).gameID();
+                    BoardDrawing.drawBoard(new ChessGame().getBoard(), true);
+                    return "Observing game " + parts[1];
+                } catch (Exception e) {
+                    return "Observe failed: " + e.getMessage() + " - Try listing some games first!";
+                }
             }
             case "logout" -> {
                 try {
