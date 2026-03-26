@@ -48,12 +48,16 @@ public class PostloginUI {
                 try {
                     Collection<GameData> tempList = facade.listGames(authToken);
                     StringBuilder allGames = new StringBuilder();
+                    int number = 1;
                     for (GameData game : tempList) {
                         allGames.append(game.gameName())
-                                .append(" | White: ").append(game.whiteUsername() != null ? game.whiteUsername() : "empty")
-                                .append(" | Black: ").append(game.blackUsername() != null ? game.blackUsername() : "empty")
-                                .append("\n");
-                    }
+                            .append(" | White: ").append(game.whiteUsername() != null ? game.whiteUsername() : "empty")
+                            .append(" | Black: ").append(game.blackUsername() != null ? game.blackUsername() : "empty")
+                            .append("\n");
+                            number++;
+                        }
+                        lastGameList = new ArrayList<>(tempList);
+
                     return allGames.toString();
                 }
                 catch (Exception e) {
@@ -65,7 +69,9 @@ public class PostloginUI {
                     return "Usage: join <ID> [WHITE|BLACK]";
                 }
                 try {
-                    facade.joinGame(authToken, Integer.parseInt(parts[1]), parts[2]);
+                    int listNumber = Integer.parseInt(parts[1]);
+                    int realGameID = lastGameList.get(listNumber - 1).gameID();
+                    facade.joinGame(authToken, realGameID, parts[2]);
                     boolean isWhite = parts[2].equalsIgnoreCase("WHITE");
                     BoardDrawing.drawBoard(new ChessGame().getBoard(), isWhite);
                     return "Joined game " + parts[1];
@@ -74,8 +80,10 @@ public class PostloginUI {
                 }
             }
             case "observe" -> {
+                int listNumber = Integer.parseInt(parts[1]);
+                int realGameID = lastGameList.get(listNumber - 1).gameID();
                 if (parts.length != 2) {
-                    return "Usage: observe <" + parts[1] + ">";
+                    return "Usage: observe <ID>";
                 }
                 BoardDrawing.drawBoard(new ChessGame().getBoard(), true);
                 return "Observing game " + parts[1];
