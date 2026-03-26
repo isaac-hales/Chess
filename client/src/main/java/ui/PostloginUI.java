@@ -88,8 +88,15 @@ public class PostloginUI {
                     int realGameID = lastGameList.get(listNumber - 1).gameID();
                     BoardDrawing.drawBoard(new ChessGame().getBoard(), true);
                     return "Observing game " + parts[1];
-                } catch (Exception e) {
-                    return "Observe failed: " + e.getMessage() + " - Try listing some games first!";
+                }
+                catch (NumberFormatException e) {
+                    return "Please enter a valid number for the game ID.";
+                }
+                catch (IndexOutOfBoundsException e) {
+                    return "Invalid game number. Please choose a number between 1 and " + lastGameList.size() + ".";
+                }
+                catch (Exception e) {
+                    return "Observe failed: " + e.getMessage() + " - Please use a number!";
                 }
             }
             case "logout" -> {
