@@ -1,17 +1,17 @@
 package ui;
-import chess.ChessBoard;
+
 import chess.ChessGame;
 import chess.GameData;
 import client.ServerFacade;
-
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static ui.BoardDrawing.drawBoard;
 
 public class PostloginUI {
     private final ServerFacade facade;
     private String authToken = null;
+    private List<GameData> lastGameList = new ArrayList<>();
 
     public PostloginUI(ServerFacade facade, String authToken) {
         this.facade = facade;
