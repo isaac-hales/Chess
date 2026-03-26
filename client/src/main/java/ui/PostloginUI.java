@@ -90,10 +90,11 @@ public class PostloginUI {
                     return "Observing game " + parts[1];
                 }
                 catch (NumberFormatException e) {
-                    return "Please enter a valid number for the game ID.";
+                    return "Please enter a valid number for gameID, and not the game name. ";
                 }
                 catch (IndexOutOfBoundsException e) {
-                    return "Invalid game number. Please choose a number between 1 and " + lastGameList.size() + ".";
+                    return "Please choose a number between 1 and " + lastGameList.size() + ". " +
+                            "The number you gave, " + parts[1] + ", is out of bounds.";
                 }
                 catch (Exception e) {
                     return "Observe failed: " + e.getMessage() + " - Please use a number!";
