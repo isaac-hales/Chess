@@ -4,8 +4,6 @@ import chess.ChessGame;
 
 public class LoadGameMessage extends ServerMessage{
     ServerMessageType serverMessageType;
-    String NotificationMessage;
-    String ErrorMessage;
     ChessGame game;
     
     LoadGameMessage(ChessGame game){
