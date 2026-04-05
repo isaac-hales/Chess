@@ -135,13 +135,20 @@ public class WebSocketHandler {
             return;
         }
         String username = authData.username();
+        if (!username.equals(currentGame.whiteUsername()) && !username.equals(currentGame.blackUsername())) {
+            ctx.send(gson.toJson(new ErrorMessage("Error: observers cannot resign. Though that would be funny")));
+            return;
+        }
         currentGame.game().setGameOver(true);
-        broadcast(gameID, null, new NotificationMessage("Player " + username + " has resigned."));
-
+        gameDAO.updateGame(new GameData(gameID, currentGame.whiteUsername(),
+                currentGame.blackUsername(), currentGame.gameName(), currentGame.game()));
+        broadcast(gameID, null, new NotificationMessage(username + " has resigned. That's the game!"));
     }
 
     public void onClose(WsContext ctx) {
-
+        for (var entry: gameSessions.entrySet()) {
+            entry.getValue().remove(ctx);
+        }
     }
 
     public void sendToOne(WsContext ctx, ServerMessage message) {

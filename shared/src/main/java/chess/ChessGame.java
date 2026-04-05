@@ -93,11 +93,19 @@ public class ChessGame {
     }
 
     public boolean isInCheckmate(TeamColor teamColor) {
-        return isInCheck(teamColor) && hasNoValidMoves(teamColor);
+        if (isInCheck(teamColor) && hasNoValidMoves(teamColor)) {
+            setGameOver(true);
+            return true;
+        }
+        return false;
     }
 
     public boolean isInStalemate(TeamColor teamColor) {
-        return !isInCheck(teamColor) && hasNoValidMoves(teamColor);
+        if (!isInCheck(teamColor) && hasNoValidMoves(teamColor)){
+            setGameOver(true);
+            return true;
+        }
+        return false;
     }
 
     public void setBoard(ChessBoard board) {
