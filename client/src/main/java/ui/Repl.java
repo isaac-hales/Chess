@@ -17,10 +17,13 @@ public class Repl {
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
         PreloginUI preloginUI = new PreloginUI(facade);
-        PostloginUI postloginUI = new PostloginUI(facade, authToken);
+        PostloginUI postloginUI = null;
+
         while (running) {
             if (authToken == null) {
                 System.out.print("[LOGGED_OUT] >>> ");
+            } else if (postloginUI != null && postloginUI.getGameplayUI() != null) {
+                System.out.print("[IN GAME] >>> ");
             } else {
                 System.out.print("[LOGGED_IN] >>> ");
             }
@@ -38,6 +41,20 @@ public class Repl {
                     System.out.println(result);
                 }
             }
+
+            else if (postloginUI.getGameplayUI() != null) {
+                try {
+                    String result = postloginUI.getGameplayUI().eval(userInput);
+                    if (result.equals("leave")) {
+                        postloginUI.clearGameplayUI();
+                    } else {
+                        System.out.println(result);
+                    }
+                } catch (Exception e) {
+                    System.out.println("Error: " + e.getMessage());
+                }
+            }
+
             else {
                 try {
                     String result = postloginUI.eval(userInput);

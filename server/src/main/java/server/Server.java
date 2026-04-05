@@ -35,7 +35,11 @@ public class Server {
         Gson gson = new Gson();
         JsonMapper gsonMapper = createGsonMapper(gson);
         javalin = Javalin.create(config -> {
-            config.staticFiles.add("web");
+            try {
+                config.staticFiles.add("web");
+            } catch (Exception e) {
+                System.out.println("Web folder not found, skipping static files");
+            }
             config.jsonMapper(gsonMapper);
         });
         javalin.exception(ServiceException.class, (e, ctx) -> {

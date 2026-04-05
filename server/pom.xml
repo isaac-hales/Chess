@@ -20,6 +20,11 @@
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -100,12 +105,6 @@
             <artifactId>tyrus-standalone-client</artifactId>
             <version>2.1.4</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.tyrus.bundles</groupId>
-            <artifactId>tyrus-standalone-client</artifactId>
-            <version>2.1.4</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>edu.byu.cs240</groupId>

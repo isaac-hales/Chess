@@ -6,6 +6,7 @@ import dataaccess.AuthDAOInterface;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAOInterface;
 import io.javalin.websocket.WsContext;
+import io.javalin.websocket.WsMessageContext;
 import service.GameService;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
@@ -35,7 +36,7 @@ public class WebSocketHandler {
 
     }
 
-    public void onMessage(WsContext ctx) {
+    public void onMessage(WsMessageContext ctx) {
         try {
             UserGameCommand command = gson.fromJson(ctx.message(), UserGameCommand.class);
             switch (command.getCommandType()) {
@@ -70,7 +71,7 @@ public class WebSocketHandler {
         broadcast(gameID, ctx, new NotificationMessage(username + " has joined the game"));
     }
 
-    private void handleMakeMove(WsContext ctx, UserGameCommand command) throws DataAccessException, InvalidMoveException {
+    private void handleMakeMove(WsMessageContext ctx, UserGameCommand command) throws DataAccessException, InvalidMoveException {
         String authToken = command.getAuthToken();
         Integer gameID = command.getGameID();
         GameData currentGame = gameDAO.getGame(gameID);
@@ -150,6 +151,8 @@ public class WebSocketHandler {
             entry.getValue().remove(ctx);
         }
     }
+
+
 
     public void sendToOne(WsContext ctx, ServerMessage message) {
         ctx.send(gson.toJson(message));

@@ -3,6 +3,8 @@ package ui;
 import chess.ChessGame;
 import chess.GameData;
 import client.ServerFacade;
+import client.WebSocketCommunicator;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -11,6 +13,7 @@ public class PostloginUI {
     private final ServerFacade facade;
     private String authToken = null;
     private List<GameData> lastGameList = new ArrayList<>();
+    private GameplayUI gameplayUI = null;
 
     public PostloginUI(ServerFacade facade, String authToken) {
         this.facade = facade;
@@ -70,8 +73,10 @@ public class PostloginUI {
                     int listNumber = Integer.parseInt(parts[1]);
                     int realGameID = lastGameList.get(listNumber - 1).gameID();
                     facade.joinGame(authToken, realGameID, parts[2]);
-                    boolean isWhite = parts[2].equalsIgnoreCase("WHITE");
-                    BoardDrawing.drawBoard(new ChessGame().getBoard(), isWhite);
+                    ChessGame.TeamColor color = parts[2].equalsIgnoreCase("WHITE") ?
+                            ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+                    gameplayUI = new GameplayUI(facade.getServerUrl(), authToken, "", realGameID, color);
+                    gameplayUI.connect();
                     return "Joined game " + parts[1];
                 } catch (Exception e) {
                     return "Join failed: " + e.getMessage();
@@ -83,7 +88,8 @@ public class PostloginUI {
                 } try {
                     int listNumber = Integer.parseInt(parts[1]);
                     int realGameID = lastGameList.get(listNumber - 1).gameID();
-                    BoardDrawing.drawBoard(new ChessGame().getBoard(), true);
+                    gameplayUI = new GameplayUI(facade.getServerUrl(), authToken, "", realGameID, ChessGame.TeamColor.WHITE);
+                    gameplayUI.connect();
                     return "Observing game " + parts[1];
                 } catch (NumberFormatException e) {
                     return "Please enter a valid number for gameID, and not the game name. ";
@@ -115,4 +121,13 @@ public class PostloginUI {
         }
         return "Unknown error. Type 'help' for options.";
     }
+
+    public GameplayUI getGameplayUI() {
+        return gameplayUI;
+    }
+
+    public void clearGameplayUI() {
+        gameplayUI = null;
+    }
+
 }

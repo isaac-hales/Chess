@@ -91,4 +91,7 @@ public class ServerFacade {
         makeRequest("PUT","/game",request,null,authToken);
     }
 
+    public String getServerUrl() {
+        return serverUrl;
+    }
 }

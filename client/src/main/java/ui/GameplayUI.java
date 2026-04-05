@@ -21,12 +21,12 @@ public class GameplayUI implements MessageHandler {
     private ChessGame currentGame;
     private final Gson gson = new Gson();
 
-    public GameplayUI(WebSocketCommunicator ws, String authToken, String username, int gameID, ChessGame.TeamColor playerColor) {
-        this.ws = ws;
+    public GameplayUI(String serverUrl, String authToken, String username, int gameID, ChessGame.TeamColor playerColor) throws Exception {
         this.authToken = authToken;
         this.username = username;
         this.gameID = gameID;
         this.playerColor = playerColor;
+        this.ws = new WebSocketCommunicator(this, serverUrl);
     }
 
     public String eval(String input) throws Exception {
@@ -103,6 +103,10 @@ public class GameplayUI implements MessageHandler {
             }
         }
 
+    }
+
+    public void connect() throws Exception {
+        ws.connect(authToken, gameID);
     }
 
     @Override
