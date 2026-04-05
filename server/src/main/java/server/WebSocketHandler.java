@@ -67,6 +67,10 @@ public class WebSocketHandler {
         }
         gameSessions.computeIfAbsent(gameID, k -> new HashSet<>()).add(ctx);
         GameData gameData = gameDAO.getGame(gameID);
+        if (gameData == null) {
+            ctx.send(gson.toJson(new ErrorMessage("Error: game not found")));
+            return;
+        }
         sendToOne(ctx, new LoadGameMessage(gameData.game()));
         broadcast(gameID, ctx, new NotificationMessage(username + " has joined the game"));
     }
@@ -87,7 +91,25 @@ public class WebSocketHandler {
             return;
         }
         String username = authData.username();
+        if (!username.equals(currentGame.whiteUsername()) && !username.equals(currentGame.blackUsername())) {
+            ctx.send(gson.toJson(new ErrorMessage("Error: observers cannot make moves")));
+            return;
+        }
         ChessGame.TeamColor currentTurn = currentGame.game().getTeamTurn();
+        // Check it's the player's turn
+        ChessGame.TeamColor playerColor = null;
+        if (username.equals(currentGame.whiteUsername())) {
+            playerColor = ChessGame.TeamColor.WHITE;
+        } else if (username.equals(currentGame.blackUsername())) {
+            playerColor = ChessGame.TeamColor.BLACK;
+        } else {
+            ctx.send(gson.toJson(new ErrorMessage("Error: observers cannot make moves")));
+            return;
+        }
+        if (playerColor != currentTurn) {
+            ctx.send(gson.toJson(new ErrorMessage("Error: it is not your turn")));
+            return;
+        }
         currentGame.game().makeMove(move);
         gameDAO.updateGame(new GameData(gameID, currentGame.whiteUsername(),
                 currentGame.blackUsername(), currentGame.gameName(), currentGame.game()));
@@ -131,6 +153,10 @@ public class WebSocketHandler {
         Integer gameID = command.getGameID();
         GameData currentGame = gameDAO.getGame(gameID);
         AuthData authData = authDAO.getAuth(authToken);
+        if (currentGame.game().isGameOver()) {
+            ctx.send(gson.toJson(new ErrorMessage("Error: game is already over")));
+            return;
+        }
         if (authData == null) {
             ctx.send(gson.toJson(new ErrorMessage("Error: unauthorized")));
             return;
@@ -162,7 +188,7 @@ public class WebSocketHandler {
         var sessions = gameSessions.get(gameID);
         if (sessions != null) {
             for (var session: sessions) {
-                if (!session.equals(exclude)) {
+                if (exclude == null || !session.equals(exclude)) {
                     session.send(gson.toJson(message));
                 }
             }
