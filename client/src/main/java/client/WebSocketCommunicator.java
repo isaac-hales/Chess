@@ -9,7 +9,7 @@ import websocket.commands.UserGameCommand;
 
 import java.net.URI;
 
-@ClientEndpoint //Lets the server know that this is a WebSocket client
+@ClientEndpoint //
 public class WebSocketCommunicator {
     private Session session;
     private final client.MessageHandler messageHandler;
