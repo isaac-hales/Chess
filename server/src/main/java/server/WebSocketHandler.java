@@ -19,11 +19,11 @@ import java.util.Map;
 import java.util.Set;
 
 public class WebSocketHandler {
-    private final GameService gameService;
     private final AuthDAOInterface authDAO;
     private final GameDAOInterface gameDAO;
     private final Map<Integer, Set<WsContext>> gameSessions = new HashMap<>();
     private final Gson gson = new Gson();
+    private final GameService gameService;
 
     public WebSocketHandler(GameService gameService, AuthDAOInterface authDAO, GameDAOInterface gameDAO) {
         this.gameService = gameService;
@@ -74,21 +74,24 @@ public class WebSocketHandler {
         String authToken = command.getAuthToken();
         Integer gameID = command.getGameID();
         GameData currentGame = gameDAO.getGame(gameID);
+        if (currentGame.game().isGameOver()) {
+            ctx.send(gson.toJson(new ErrorMessage("Error: game is already over")));
+            return;
+        }
         MakeMoveCommand moveCommand = gson.fromJson(ctx.message(), MakeMoveCommand.class);
         ChessMove move = moveCommand.getMove();
         AuthData authData = authDAO.getAuth(authToken);
-        if (!validateAuthtoken(ctx,authToken)) { //Invalid authToken
+        if (authData == null) {
             ctx.send(gson.toJson(new ErrorMessage("Error: unauthorized")));
             return;
         }
-        
+        String username = authData.username();
         ChessGame.TeamColor currentTurn = currentGame.game().getTeamTurn();
         currentGame.game().makeMove(move);
         gameDAO.updateGame(new GameData(gameID, currentGame.whiteUsername(),
                 currentGame.blackUsername(), currentGame.gameName(), currentGame.game()));
         //Sending LOAD_GAME to all clients
         broadcast(gameID, null, new LoadGameMessage(currentGame.game()));
-        String username = authData.username();
         broadcast(gameID, ctx, new NotificationMessage( username + " has made the move " + move));
         ChessGame.TeamColor opponent = currentGame.game().getTeamTurn(); // the other player's color
         if (currentGame.game().isInCheckmate(opponent)) {
@@ -100,11 +103,40 @@ public class WebSocketHandler {
         }
     }
 
-    private void handleLeave(WsContext ctx, UserGameCommand command) {
-
+    private void handleLeave(WsContext ctx, UserGameCommand command) throws DataAccessException {
+        String authToken = command.getAuthToken();
+        Integer gameID = command.getGameID();
+        GameData currentGame = gameDAO.getGame(gameID);
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData == null) {
+            ctx.send(gson.toJson(new ErrorMessage("Error: unauthorized")));
+            return;
+        }
+        String username = authData.username();
+        if (username.equals(currentGame.whiteUsername())) {
+            gameDAO.updateGame(new GameData(gameID, null,
+                    currentGame.blackUsername(), currentGame.gameName(), currentGame.game()));
+        }
+        else if (username.equals(currentGame.blackUsername())) {
+            gameDAO.updateGame(new GameData(gameID, currentGame.whiteUsername(),
+                    null, currentGame.gameName(), currentGame.game()));
+        }
+        gameSessions.get(gameID).remove(ctx);
+        broadcast(gameID, null, new NotificationMessage("Player " + username + " has left the game."));
     }
 
-    private void handleResign(WsContext ctx, UserGameCommand command) {
+    private void handleResign(WsContext ctx, UserGameCommand command) throws DataAccessException {
+        String authToken = command.getAuthToken();
+        Integer gameID = command.getGameID();
+        GameData currentGame = gameDAO.getGame(gameID);
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData == null) {
+            ctx.send(gson.toJson(new ErrorMessage("Error: unauthorized")));
+            return;
+        }
+        String username = authData.username();
+        currentGame.game().setGameOver(true);
+        broadcast(gameID, null, new NotificationMessage("Player " + username + " has resigned."));
 
     }
 
@@ -125,14 +157,6 @@ public class WebSocketHandler {
                 }
             }
         }
-    }
-
-    public boolean validateAuthtoken(WsContext ctx, String authData) {
-        if (authData == null) {
-            ctx.send(gson.toJson(new ErrorMessage("Error: unauthorized")));
-            return false;
-        }
-        return true;
     }
 
 

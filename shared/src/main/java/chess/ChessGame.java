@@ -6,6 +6,7 @@ import java.util.Objects;
 public class ChessGame {
     ChessBoard gameBoard = new ChessBoard();
     TeamColor teamTurn;
+    private boolean gameOver = false;
 
     public ChessGame() { //This is a constructor, so any function that we need to run at the start, we run here.
         gameBoard.resetBoard(); //Not a mistake. It should set up the default position, by default.
@@ -156,6 +157,14 @@ public class ChessGame {
 
     public ChessBoard getBoard() {
         return gameBoard;
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
     }
 
     @Override
