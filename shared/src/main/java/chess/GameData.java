@@ -1,6 +1,5 @@
 package chess;
 
-
 public record GameData(
         int gameID,
         String whiteUsername,

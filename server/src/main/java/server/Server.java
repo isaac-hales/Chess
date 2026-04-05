@@ -29,6 +29,8 @@ public class Server {
     private final GameService gameService = new GameService(authDAO, gameDAO);
     private final ClearService clearService = new ClearService(userDAO, gameDAO, authDAO);
 
+    private final WebSocketHandler webSocketHandler = new WebSocketHandler(gameService, authDAO, gameDAO);
+
     public Server() {
         Gson gson = new Gson();
         JsonMapper gsonMapper = createGsonMapper(gson);
@@ -71,6 +73,11 @@ public class Server {
         javalin.get("/game", (ctx) -> handleListGames(ctx));
         javalin.post("/game", (ctx) -> handleCreateGame(ctx));
         javalin.put("/game", (ctx) -> handleJoinGame(ctx));
+        javalin.ws("/ws", ws -> {
+            ws.onConnect(webSocketHandler::onConnect);
+            ws.onMessage(webSocketHandler::onMessage);
+            ws.onClose(webSocketHandler::onClose);
+        });
     }
 
     private void handleClear(io.javalin.http.Context ctx) {

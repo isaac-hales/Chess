@@ -80,7 +80,6 @@ public class ChessGame {
         throw new InvalidMoveException("Your move " + move + " is not a legal move.");
     }
 
-
     public boolean isInCheck(TeamColor teamColor) {
         ChessPosition kingPosition = findKing(teamColor);
         Collection<ChessMove> opposingMoves = getOpposingMoves(teamColor);
