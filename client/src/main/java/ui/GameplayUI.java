@@ -61,16 +61,7 @@ public class GameplayUI implements MessageHandler {
                 try {
                     ChessPosition from = parsePosition(parts[1]);
                     ChessPosition to = parsePosition(parts[2]);
-                    ChessPiece.PieceType promotion = null;
-                    if (parts.length == 4) {
-                        promotion = switch (parts[3].toLowerCase()) {
-                            case "queen" -> ChessPiece.PieceType.QUEEN;
-                            case "rook" -> ChessPiece.PieceType.ROOK;
-                            case "bishop" -> ChessPiece.PieceType.BISHOP;
-                            case "knight" -> ChessPiece.PieceType.KNIGHT;
-                            default -> null;
-                        };
-                    }
+                    ChessPiece.PieceType promotion = parsePromotion(parts);
                     ChessMove move = new ChessMove(from, to, promotion);
                     ws.makeMove(authToken, gameID, move);
                     return "";
@@ -135,6 +126,19 @@ public class GameplayUI implements MessageHandler {
         int col = pos.charAt(0) - 'a' + 1; //'a' = 1, 'b' = 2, yada yada
         int row = Integer.parseInt(String.valueOf(pos.charAt(1)));
         return new ChessPosition(row, col);
+    }
+
+    private ChessPiece.PieceType parsePromotion(String[] parts) {
+        if (parts.length != 4) {
+            return null;
+        }
+        return switch (parts[3].toLowerCase()) {
+            case "queen" -> ChessPiece.PieceType.QUEEN;
+            case "rook" -> ChessPiece.PieceType.ROOK;
+            case "bishop" -> ChessPiece.PieceType.BISHOP;
+            case "knight" -> ChessPiece.PieceType.KNIGHT;
+            default -> null;
+        };
     }
 
 }
