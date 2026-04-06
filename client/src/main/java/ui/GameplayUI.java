@@ -140,5 +140,4 @@ public class GameplayUI implements MessageHandler {
             default -> null;
         };
     }
-
 }
