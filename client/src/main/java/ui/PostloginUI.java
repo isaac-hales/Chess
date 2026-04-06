@@ -58,7 +58,6 @@ public class PostloginUI {
                             number++;
                         }
                         lastGameList = new ArrayList<>(tempList);
-
                     return allGames.toString();
                 }
                 catch (Exception e) {
@@ -110,7 +109,6 @@ public class PostloginUI {
                 catch (Exception e) {
                     return "Logout failed: " + e.getMessage();
                 }
-
             }
             case "quit" -> {
                 if (parts.length == 1) {

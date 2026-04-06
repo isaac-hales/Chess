@@ -138,7 +138,6 @@ public class WebSocketTests {
     @DisplayName("Make Move for Opponent")
     public void invalidMoveOpponent() {
         setupNormalGame();
-
         //attempt to have black player move white piece
         ChessMove move = new ChessMove(new ChessPosition(2, 5), new ChessPosition(4, 5), null);
         makeMove(black, gameID, move, false, false, Set.of(white, observer), Set.of(), "move made for opponent");
