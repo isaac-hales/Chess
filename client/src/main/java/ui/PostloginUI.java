@@ -76,8 +76,9 @@ public class PostloginUI {
                             ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
                     gameplayUI = new GameplayUI(facade.getServerUrl(), authToken, "", realGameID, color);
                     gameplayUI.connect();
-                    return "Joined game " + parts[1];
+                    return "joined";
                 } catch (Exception e) {
+                    gameplayUI = null;
                     return "Join failed: " + e.getMessage();
                 }
             }

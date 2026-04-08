@@ -12,8 +12,8 @@ public class BoardDrawing {
     public static void drawBoard(ChessBoard board, boolean isWhitePerspective,
                                  ChessPosition selectedPos, Collection<ChessMove> legalMoves) {
          String borderLetters = isWhitePerspective ?
-                "    a  b  c  d  e  f  g  h    " :
-                "    h  g  f  e  d  c  b  a    ";
+                "    a   b   c   d   e   f   g   h    " :
+                "    h   g   f   e   d   c   b   a    ";
         System.out.println(SET_BG_COLOR_DARK_GREY + borderLetters + RESET_BG_COLOR);
 
         int rowStart = isWhitePerspective ? 8 : 1;

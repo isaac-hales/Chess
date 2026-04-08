@@ -18,7 +18,8 @@ public class WebSocketCommunicator {
     public WebSocketCommunicator(MessageHandler messageHandler, String serverURL) throws Exception {
         this.messageHandler = messageHandler;
         var webSocketContainer = ContainerProvider.getWebSocketContainer();
-        webSocketContainer.connectToServer(this, new URI(serverURL + "/ws"));
+        var wsUrl = serverURL.replace("http://", "ws://");
+        webSocketContainer.connectToServer(this, new URI(wsUrl + "/ws"));
     }
 
     public void sendMessage(String message) throws Exception {
